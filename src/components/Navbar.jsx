@@ -5,7 +5,7 @@ export default function Navbar() {
   const [logged, setLogged] = useState(false);
 
   return (
-    <nav className="bg-[#222221] text-white px-4 py-3 flex justify-between items-center shadow-lg">
+    <nav className="bg-[#d9d9d9] text-white px-4 py-3 flex justify-between items-center shadow-lg absolute top-0 left-0 right-0">
       <div className="flex items-center space-x-3">
         <img
           src="https://play-lh.googleusercontent.com/a7R5nyeaX8lIEWdBOxjlvbyq9LcFwh3XMvNtBPEKR3LPGgdvgGrec4sJwn8tUaaSkw"
