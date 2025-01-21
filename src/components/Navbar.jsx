@@ -12,7 +12,7 @@ export default function Navbar() {
           alt="Chess Logo"
           className="w-10 h-10"
         />
-        <span className="text-xl font-bold">Chess.com</span>
+        <span className="text-2xl font-bold">Chess<span className="text-xl font-semibold">.com</span></span>
       </div>
       <div>
         {logged ? (
