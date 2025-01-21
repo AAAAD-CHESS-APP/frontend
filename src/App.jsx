@@ -1,11 +1,13 @@
+import LandingHome from "./components/LandingHome";
+import Navbar from "./components/Navbar";
 
 function App() {
-
   return (
     <>
-      <h1>Chess App</h1>
+      <Navbar />
+      <LandingHome />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
