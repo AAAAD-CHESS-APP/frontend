@@ -270,7 +270,12 @@ function OnlineGame() {
                     </div>
                     <div className="flex justify-center flex-col items-center mt-10">
                         <div className="flex flex-row justify-between w-full text-white">
-                            <div>{user === whitePlayer ? blackPlayer : whitePlayer}</div>
+                            <div className={`${
+                        (color === 'white' && game.turn() === 'w') || 
+                        (color === 'black' && game.turn() === 'b') 
+                        ? 'text-red-400' 
+                        : 'text-green-400'
+                    }`}>{user === whitePlayer ? blackPlayer : whitePlayer}</div>
                             <div>10:00</div>
                         </div>
                         <div>
@@ -289,7 +294,12 @@ function OnlineGame() {
                             />
                         </div>
                         <div className="flex flex-row justify-between w-full text-white">
-                            <div>{user} (You)</div>
+                            <div className={`${
+                            (color === 'white' && game.turn() === 'w') || 
+                            (color === 'black' && game.turn() === 'b') 
+                             ? 'text-green-400' 
+                            : 'text-red-400'
+                        }`}>{user} (You)</div>
                             <div>10:00</div>
                         </div>
                         <button className="bg-red-500 text-white p-2 mt-2 rounded-sm w-20" onClick={resign}>Resign</button>

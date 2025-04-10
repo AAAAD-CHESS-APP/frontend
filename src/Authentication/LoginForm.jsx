@@ -34,6 +34,11 @@ export default function LoginForm() {
       localStorage.setItem("token", token);
       navigate("/home");
     } catch (error) {
+      const res = error.response;
+      if (res && res.status === 401 && res.data.redirect) {
+        window.location.href = res.data.redirect;
+        return;
+      }
       toast.error(error?.response?.data?.error || "Some error Occurred");
       console.log(error?.response?.data?.error);
     }
