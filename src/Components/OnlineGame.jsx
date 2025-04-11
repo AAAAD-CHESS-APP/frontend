@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import toast from 'react-hot-toast';
@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ScrollToBottom from 'react-scroll-to-bottom';
 import BarLoader from "react-spinners/BarLoader";
+import { LuSend } from "react-icons/lu";
+import Result from "./Result";
 
 const SOCKET_SERVER_URL = `http://localhost:8080`;
 const socket = io(SOCKET_SERVER_URL, {
@@ -28,6 +30,12 @@ function OnlineGame() {
         if (room) return room;
         return '';
     });
+
+    const roomNameRef = useRef(RoomName);
+    useEffect(() => {
+        roomNameRef.current =RoomName;
+    }, [RoomName]);
+
     // const [turn, setTurn] = useState(0);
     const [whitePlayer, setWhitePlayer] = useState('');
     const [blackPlayer, setBlackPlayer] = useState('');
@@ -41,6 +49,7 @@ function OnlineGame() {
     const [showfens, setShowfens] = useState(true);
     const [pgns, setPgns] = useState([]);
     const [showPng, setShowPng] = useState(false);
+    const [gameEnded,setGameEnded] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -92,12 +101,18 @@ function OnlineGame() {
             sessionStorage.removeItem('roomName');
             sessionStorage.removeItem('online-game');
             toast.success(result);
-            navigate('/home');
+            navigate(`/game/result/${roomNameRef.current}`);
+            // navigate('/home');
+            setGameEnded(true);
         })
     }, [])
 
 
+    const notify = (txt) => toast.error(txt);
+    
+
     const onDrop = async (sourceSquare, targetSquare) => {
+        try{
         if ((color === 'white' && game.turn() === 'w') || (color === 'black' && game.turn() === 'b')) {
 
             const move = game.move({
@@ -120,17 +135,30 @@ function OnlineGame() {
                 sessionStorage.setItem('online-game', fen);
                 if (game.isCheckmate()) {
                     const winner = move.color === "w" ? "White" : "Black";
-                    socket.emit('game-over', { roomName: RoomName, result: `${winner} wins by checkmate` });
+                    await new Promise((resolve) => {
+                    socket.emit('game-over', { roomName: RoomName, result: `${winner} wins by checkmate` },resolve);
+                });
                     clearSessionStorage();
-                    navigate('/home');
+                    // navigate('/home');
+                    navigate(`/game/result/${roomNameRef.current}`);
+                    setGameEnded(true);
                 } else if (game.isStalemate()) {
-                    socket.emit('game-over', { roomName: RoomName, result: `stalemate` });
+                    await new Promise((resolve) => {
+                        socket.emit('game-over', { roomName: RoomName, result: `stalemate` },resolve);
+                    });
                     clearSessionStorage();
-                    navigate('/home');
+                   // navigate('/home');
+                   navigate(`/game/result/${roomNameRef.current}`);
+                   setGameEnded(true);
+
                 } else if (game.isDraw()) {
-                    socket.emit('game-over', { roomName: RoomName, result: `draw` });
+                    await new Promise((resolve) => {
+                        socket.emit('game-over', { roomName: RoomName, result: `draw` },resolve);
+                    });
                     clearSessionStorage();
-                    navigate('/home');
+                    // navigate('/home');
+                    navigate(`/game/result/${roomNameRef.current}`);
+                    setGameEnded(true);
                 }
 
                 sessionStorage.setItem("game", game.fen());
@@ -138,15 +166,23 @@ function OnlineGame() {
                 setPgns(prevPgn => [...prevPgn, game.pgn()]);
             }
         }
+        else notify("Not Your Turn Nigger");
+    }catch(err){
+        notify("Invalid Move");
+    }
     };
 
 
 
-    function resign() {
-        socket.emit('resign', { roomName: RoomName, user: user, color: color });
+    async function resign() {
+        await new Promise((resolve) => {
+            socket.emit('resign',  { roomName: RoomName, user: user, color: color },resolve);
+        });
         toast.success(`${color} resigned`);
         clearSessionStorage();
-        navigate('/home');
+        setGameEnded(true);
+        navigate(`/game/result/${roomNameRef.current}`);
+        //navigate('/home');
     }
 
     function stopSearchingForThisUser() {
@@ -230,10 +266,10 @@ function OnlineGame() {
 
     const renderMessages = messages.map((msg, index) => {
         return (<div key={index} className=" rounded-sm">
-            <p className={` ${msg.user === user ? 'text-green-600' : 'text-orange-500'}`} >{msg.user}</p>
-            <div className="flex flex-col">
+            {/* <p className={` ${msg.user === user ? 'text-green-600' : 'text-orange-500'}`} >{msg.user}</p> */}
+            <div className={`flex flex-col ${msg.user == user ? 'items-end' : 'items-start'}`}>
+                <div className={`text-white rounded-md p-1 px-2 ${msg.user == user ? 'bg-green-600' : 'bg-[#303030]'} max-w-[70%] break-words`}>{msg.text}</div>
                 <div className="text-xs text-gray-600">{msg.timestamp}</div>
-                <div className="text-black bg-[#f8f7f7] rounded-md p-1 px-2">{msg.text}</div>
             </div>
         </div>)
     })
@@ -249,33 +285,131 @@ function OnlineGame() {
         setShowPng(true);
     }
 
+    const customPieces = {
+        wP: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wp.png"
+            alt="White Pawn"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wR: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wr.png"
+            alt="White Rook"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wN: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wn.png"
+            alt="White Knight"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wB: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wb.png"
+            alt="White Bishop"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wQ: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wq.png"
+            alt="White Queen"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wK: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wk.png"
+            alt="White King"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bP: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bp.png"
+            alt="Black Pawn"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bR: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/br.png"
+            alt="Black Rook"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bN: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bn.png"
+            alt="Black Knight"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bB: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bb.png"
+            alt="Black Bishop"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bQ: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bq.png"
+            alt="Black Queen"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bK: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bk.png"
+            alt="Black King"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+      };
+
     return (
         <div>
             {RoomName &&
                 <div className="flex items-center justify-around bg-[#121212] h-[100vh]">
-                    <div className="bg-[#F3F4F6] w-[28%] flex flex-col p-4 text-white">
-                        <p className="text-xl text-black font-semibold border-b-2 pb-2">Chat Room</p>
-                        <ScrollToBottom className="h-[400px] overflow-x-auto whitespace-normal p-2">
+                    <div className="bg-[#F3F4F6] w-[28%] flex flex-col p-4 text-white rounded-sm">
+                        <p className="text-xl text-black font-semibold border-b-2 pb-2">{user === whitePlayer ? blackPlayer : whitePlayer}</p>
+                        <ScrollToBottom className="h-[480px] overflow-x-auto whitespace-normal p-2">
                             <div className="flex gap-4 flex-col">
                                 {renderMessages}
                             </div>
                         </ScrollToBottom>
-                        <input className="outline-none bg-[#ebeaea] p-1 relative bottom-0 text-black"
+                        <div className="flex items-center justify-center bg-[#ebeaea] p-2 px-3 relative bottom-0 text-black border rounded-sm border-gray-300 ">
+                        <input className="outline-none w-[90%] bg-[#ebeaea]"
                             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                             onChange={(e) => setMessage(e.target.value)}
                             value={message}
                             placeholder="Type To Chat"
-
-                        ></input>
+                        > </input>
+                         <LuSend
+                        className="ml-2 text-2xl cursor-pointer text-gray-500"
+                        onClick={sendMessage}
+                        />
+                        </div>
                     </div>
                     <div className="flex justify-center flex-col items-center mt-10">
                         <div className="flex flex-row justify-between w-full text-white">
                             <div className={`${
                         (color === 'white' && game.turn() === 'w') || 
                         (color === 'black' && game.turn() === 'b') 
-                        ? 'text-red-400' 
-                        : 'text-green-400'
-                    }`}>{user === whitePlayer ? blackPlayer : whitePlayer}</div>
+                        ? 'text-white' 
+                        : 'text-green-600 font-semibold'
+                    }`}>
+                        
+                        <div className="flex justify-center items-center gap-2 mb-1">
+                        <img src={`https://ui-avatars.com/api/?name=${user === whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
+                        {user === whitePlayer ? blackPlayer : whitePlayer}
+                        </div>
+                    </div>
                             <div>10:00</div>
                         </div>
                         <div>
@@ -285,32 +419,42 @@ function OnlineGame() {
                                 boardOrientation={color === "white" ? "white" : "black"}
                                 autoPromoteToQueen={true}
                                 boardWidth={boardWidth}
-                                customDarkSquareStyle={{
-                                    backgroundColor: "#888c94",
-                                }}
-                                customLightSquareStyle={{
-                                    backgroundColor: "#f0ecec",
-                                }}
+                                customBoardStyle={{
+                                    borderRadius: "0.25rem",
+                                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                                  }}
+                                  customDarkSquareStyle={{
+                                    backgroundColor: "#888c95",
+                                  }}
+                                  customLightSquareStyle={{
+                                    backgroundColor: "#efeceb",
+                                  }}
+                                  customPieces={customPieces}
                             />
                         </div>
                         <div className="flex flex-row justify-between w-full text-white">
                             <div className={`${
                             (color === 'white' && game.turn() === 'w') || 
                             (color === 'black' && game.turn() === 'b') 
-                             ? 'text-green-400' 
-                            : 'text-red-400'
-                        }`}>{user} (You)</div>
+                             ? 'text-green-600  font-semibold' 
+                            : 'text-white'
+                        }`}>
+                            <div className="flex justify-center items-center gap-2 mt-3">
+                             <img src={`https://ui-avatars.com/api/?name=${user === whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
+                            {user} (You)
+                            </div>
+                            </div>
                             <div>10:00</div>
                         </div>
-                        <button className="bg-red-500 text-white p-2 mt-2 rounded-sm w-20" onClick={resign}>Resign</button>
+                        <button className="bg-red-500 text-white px-3 py-1 mt-2 rounded-sm w-20" onClick={resign}>Resign</button>
                     </div>
 
-                    <div className="bg-[#F3F4F6] w-[25%] h-[400px] p-4 text-white relative break-words">
+                    <div className="bg-[#F3F4F6] w-[25%] h-[585px] p-4 text-white relative break-words rounded-sm">
                         <div className="flex flex-row justify-center gap-2">
-                            <div className={`${showfens ? `bg-blue-600` : `bg-blue-500`}  pl-2 pr-2 pt-1 pb-1 rounded-sm cursor-pointer`} onClick={toggleToFen}>fen</div>
-                            <div className={`${showPng ? `bg-blue-600` : `bg-blue-500`} pl-2 pr-2 pt-1 pb-1 rounded-sm cursor-pointer`} onClick={toggleToPgn}>pgn</div>
+                            <div className={`${showfens ? `bg-green-600` : `bg-black`}  px-6 py-1 rounded-md cursor-pointer`} onClick={toggleToFen}>fen</div>
+                            <div className={`${showPng ? `bg-green-600` : `bg-black`} px-6 py-1 rounded-md cursor-pointer`} onClick={toggleToPgn}>pgn</div>
                         </div>
-                        <ScrollToBottom className="h-[350px] whitespace-normal p-2">
+                        <ScrollToBottom className="h-[540px] whitespace-normal p-2">
                             {showfens && <div className="flex gap-4 flex-col">
                                 {renderFens}
                             </div>
@@ -327,9 +471,10 @@ function OnlineGame() {
             {
                 !RoomName &&
                 <div className="flex justify-center items-center flex-col gap-2 bg-[#121212] h-[100vh]">
-                    <div className="flex flex-col justify-center items-center bg-[white] p-8 rounded-sm gap-4">
-                        <div className="text-black">{quote}</div>
+                    <div className="flex flex-col justify-center items-center p-8 rounded-sm gap-4">
+                        <div className="text-white">{quote}</div>
                         <BarLoader
+                            color="#fff"
                             size={150}
                             aria-label="Loading Spinner"
                             data-testid="loader"
@@ -338,6 +483,17 @@ function OnlineGame() {
                     </div>
                 </div>
             }
+
+
+            {/* {gameEnded && 
+           <div className="absolute inset-0 w-full backdrop-blur-sm bg-black/30">
+           <div className="flex items-center justify-center h-full">
+             <div className="bg-white p-6 rounded shadow">
+               <Result roomId={RoomName} resetGame={resetGame}/>
+             </div>
+           </div>
+         </div>
+            } */}
 
         </div>
     )

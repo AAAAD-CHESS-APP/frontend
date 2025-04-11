@@ -21,6 +21,7 @@ import ProtectedAdmin from "./Admin/ProtectedAdmin";
 import Verify from "./Authentication/Verify";
 import VerifyConfirmation from "./Authentication/VerifyConfirmation";
 import Userdashboard from "./Users/Userdashboard";
+import ResultPage from "./Components/ResultPage";
 
 function App() {
   const hoverIntensity = 0.5;
@@ -102,7 +103,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/game/result/:roomId"
+            element={
+              <ProtectedRoute>
+                <ResultPage />
+              </ProtectedRoute>
+            }
+          />
+          
         </Routes>
+
       </BrowserRouter>
     </div>
   );
