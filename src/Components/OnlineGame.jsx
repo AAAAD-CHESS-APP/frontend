@@ -440,7 +440,7 @@ function OnlineGame() {
                             : 'text-white'
                         }`}>
                             <div className="flex justify-center items-center gap-2 mt-3">
-                             <img src={`https://ui-avatars.com/api/?name=${user === whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
+                             <img src={`https://ui-avatars.com/api/?name=${user !== whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
                             {user} (You)
                             </div>
                             </div>
@@ -470,16 +470,79 @@ function OnlineGame() {
             }
             {
                 !RoomName &&
-                <div className="flex justify-center items-center flex-col gap-2 bg-[#121212] h-[100vh]">
-                    <div className="flex flex-col justify-center items-center p-8 rounded-sm gap-4">
-                        <div className="text-white">{quote}</div>
-                        <BarLoader
-                            color="#fff"
-                            size={150}
-                            aria-label="Loading Spinner"
-                            data-testid="loader"
-                        />
-                        <button onClick={stopSearchingBtnClicked} className="bg-green-600 text-white rounded-sm p-2 w-40">stop searching</button>
+                <div className="flex justify-center items-center bg-gradient-to-b from-gray-50 to-gray-100 h-[100vh]">
+                    <div className="bg-white border border-gray-200 rounded-xl shadow-md p-8 max-w-2xl w-full mx-4 transform transition duration-500">
+                        <div className="text-center mb-8">
+                            <div className="inline-block mb-4">
+                                <svg className="w-12 h-12 mx-auto text-black animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                                </svg>
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Finding an Opponent</h2>
+                            <p className="text-gray-500">We're matching you with a player of similar skill</p>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-6 mb-8 border border-gray-100 shadow-inner">
+                            <div className="flex items-center">
+                                <div className="hidden md:block">
+                                    <svg className="w-10 h-10 text-gray-300 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M12 5v14m-7-7h14"/>
+                                    </svg>
+                                </div>
+                                <blockquote className="text-lg italic text-gray-700 relative">
+                                    <span className="absolute -top-4 -left-2 text-4xl text-black opacity-10">"</span>
+                                    {quote}
+                                    <span className="absolute -bottom-4 -right-2 text-4xl text-black opacity-10">"</span>
+                                </blockquote>
+                            </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-center gap-6">
+                            <div className="flex flex-col items-center gap-3 bg-gray-50 py-4 px-8 rounded-lg w-full">
+                                <div className="flex items-center justify-center gap-3 text-gray-700 font-medium mb-1">
+                                    <span className="relative flex h-3 w-3">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-black"></span>
+                                    </span>
+                                    Searching for players
+                                </div>
+                                <BarLoader
+                                    color="#000000"
+                                    width={180}
+                                    height={4}
+                                    speedMultiplier={1.2}
+                                    aria-label="Loading Spinner"
+                                    data-testid="loader"
+                                />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                                <button 
+                                    onClick={stopSearchingBtnClicked} 
+                                    className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 active:scale-98 transition-all flex items-center justify-center gap-2 shadow-sm"
+                                >
+                                    <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    Cancel Search
+                                </button>
+                                <button 
+                                    onClick={() => navigate('/dashboard-pannel')} 
+                                    className="w-full border border-gray-300 text-gray-700 py-3 rounded-md hover:bg-gray-50 active:scale-98 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                    Return to Dashboard
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-8 text-center text-sm text-gray-500">
+                            <p>Average wait time: ~30 seconds</p>
+                        </div>
                     </div>
                 </div>
             }
