@@ -18,20 +18,42 @@ export default function UpdatePassword() {
     e.preventDefault();
     setError("");
 
+    // 1. Add password validation
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+      setError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
     }
 
     try {
-      await axios.patch(`http://localhost:8080/api/resetPassword/${id}`, {
-        password,
-        confirmPass: confirmPassword,
-      });
+      // 2. Use the correct parameter - if you're updating from dashboard, use a different endpoint
+      // This is likely coming from dashboard, not from email reset
+      const token = localStorage.getItem('token');
+      
+      await axios.patch(
+        `http://localhost:8080/api/user/password/${id}`, // Consider creating this endpoint
+        {
+          password,
+          confirmPass: confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "An error occurred.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Password update failed. Make sure your password meets the requirements.");
+      }
     }
   };
 
