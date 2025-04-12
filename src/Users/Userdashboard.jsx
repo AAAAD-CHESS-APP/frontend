@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { FiSettings, FiUser, FiTrash2, FiEdit, FiLogOut } from "react-icons/fi";
 import { MdGames, MdLeaderboard, MdOutlineEmojiEvents } from "react-icons/md";
@@ -10,6 +10,7 @@ import { authAPI, userAPI } from "../services/api";
 export default function Userdashboard() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
+  const { playerId } = useParams();
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
@@ -158,17 +159,26 @@ export default function Userdashboard() {
     }
   };
 
-  // Create a function to get pie chart data
   const getPieChartData = () => {
-    // Always use real data, even if all values are zero
-    return [
-      { name: "Wins", value: userData.wins, color: "#10B981" },
-      { name: "Losses", value: userData.loses, color: "#EF4444" },
-      { name: "Draws", value: userData.draws, color: "#6B7280" },
-    ];
+    const hasGames = userData.wins > 0 || userData.loses > 0 || userData.draws > 0;
+    if (!hasGames) return [];
+    const data = [];
+    
+    if (userData.wins > 0) {
+      data.push({ name: "Wins", value: userData.wins, color: "#10B981" });
+    }
+    
+    if (userData.loses > 0) {
+      data.push({ name: "Losses", value: userData.loses, color: "#EF4444" });
+    }
+    
+    if (userData.draws > 0) {
+      data.push({ name: "Draws", value: userData.draws, color: "#6B7280" });
+    }
+    
+    return data;
   };
 
-  // Use the function to get pie chart data
   const pieData = userData ? getPieChartData() : [];
 
   if (isLoading) {
@@ -310,7 +320,6 @@ export default function Userdashboard() {
                 </div>
               </div>
 
-              {/* Pie Chart Section - Real data only */}
               <div className="h-52 w-full">
                 {pieData && pieData.length > 0 ? (
                   <div className="relative h-full w-full">
@@ -325,7 +334,7 @@ export default function Userdashboard() {
                           paddingAngle={5}
                           dataKey="value"
                           labelLine={false}
-                          label={({ name, value }) => `${name}: ${value}`}
+                          label={({ name, value }) => `${name}: ${Math.round(value)}`} // Round to fix decimals
                         >
                           {pieData.map((entry, index) => (
                             <Cell
@@ -340,7 +349,6 @@ export default function Userdashboard() {
                       </PieChart>
                     </ResponsiveContainer>
 
-                    {/* No sample data message anymore */}
                     {userData &&
                       userData.wins === 0 &&
                       userData.loses === 0 &&
@@ -459,6 +467,16 @@ export default function Userdashboard() {
                     </div>
                     <span className="text-gray-400">→</span>
                   </button>
+                  <button
+                    onClick={() => navigate("/game/recentGames/" + userData.id)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-all"
+                  >
+                    <div className="flex items-center">
+                      <MdGames className="mr-3 text-gray-500" />
+                      <span className="text-gray-800">Recent Games</span>
+                    </div>
+                    <span className="text-gray-400">→</span>
+                  </button>
 
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
@@ -476,10 +494,10 @@ export default function Userdashboard() {
                 <p className="text-xs text-gray-500">
                   Need help? Contact{" "}
                   <a
-                    href="mailto:support@aichess.com"
+                    href="mailto:aichess.dev@gmail.com"
                     className="text-black underline"
                   >
-                    support@aichess.com
+                    aichess.dev@gmail.com
                   </a>
                 </p>
               </div>

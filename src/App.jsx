@@ -22,6 +22,7 @@ import Verify from "./Authentication/Verify";
 import VerifyConfirmation from "./Authentication/VerifyConfirmation";
 import Userdashboard from "./Users/Userdashboard";
 import ResultPage from "./Components/ResultPage";
+import RecentGames from "./Users/RecentGames";
 
 function App() {
   const hoverIntensity = 0.5;
@@ -112,6 +113,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/game/recentGames/:playerId" element={<RecentGames />} />
           
         </Routes>
 

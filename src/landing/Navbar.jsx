@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { FiLogIn, FiUserPlus } from "react-icons/fi";
+import { FiUserPlus } from "react-icons/fi";
 import { MdDashboard } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import UserContext from "../Context/UserContext";
+import { IoIosLogIn, IoIosLogOut } from "react-icons/io";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function Navbar() {
               onClick={logout}
               className="bg-transparent hover:bg-white/10 border border-white text-white transition-all duration-200 px-4 py-2 rounded-md font-medium flex items-center gap-2"
             >
-              <FiLogIn className="text-lg" />
+              <IoIosLogOut className="text-lg" />
               Log out
             </button>
           </div>
@@ -50,7 +51,7 @@ export default function Navbar() {
               onClick={() => navigate("/login")}
               className="bg-transparent hover:bg-white/10 text-white transition-all duration-200 px-4 py-2 rounded-md font-medium flex items-center gap-2"
             >
-              <FiLogIn className="text-lg" />
+              <IoIosLogIn className="text-lg" />
               Log in
             </button>
 

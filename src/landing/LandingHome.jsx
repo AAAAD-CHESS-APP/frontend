@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaRobot, FaUsers, FaGlobe } from "react-icons/fa";
-import { FiLogIn, FiUserPlus } from "react-icons/fi";
+import { FiLogIn, FiUserPlus, FiX } from "react-icons/fi";
 import ChessBoard from "./ChessBoard";
 import { useNavigate } from "react-router-dom";
 
@@ -57,6 +57,14 @@ export default function LandingHome() {
       {showModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div className="bg-[rgba(26,26,26,0.9)] text-white rounded-2xl shadow-lg w-[40%] max-w-[500px] h-[40%] max-h-[400px] p-8 flex flex-col items-center justify-between relative animate-fade-in">
+            <button 
+              onClick={closeModal}
+              className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors"
+              aria-label="Close modal"
+            >
+              <FiX className="text-2xl" />
+            </button>
+            
             <h2 className="text-4xl font-bold mb-4">Login Required</h2>
             <p className="text-center text-lg text-[#d9d9d9] mb-6">
               You need to log in to continue. Please log in or sign up to
