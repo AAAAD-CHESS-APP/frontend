@@ -9,6 +9,7 @@ import HintPanel from './HintPanel';
 import ActiveHint from './ActiveHInt';
 import GameTimer from './GameTimer';
 import TimeControlSelector from './TimeControlSelector';
+import "./slider.css"
 
 const ChessGame = () => {
   const [game, setGame] = useState(new Chess());
@@ -604,20 +605,20 @@ const ChessGame = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
+    <div className="flex flex-col items-center gap-4 p-4 mt-10">
       {!gameStarted ? (
 
         <div className="flex flex-col items-center gap-2 mb-4">
 
-          <div className='flex gap-10 my-10 w-[80rem]'>
+          <div className='flex flex-wrap gap-10 my-10 w-[80rem]'>
             <div className='flex-1'>
-              <h3 className="text-xl text-white mb-3 text-center">Game Mode</h3>
+              <h3 className="text-xl font-semibold text-white mb-3 text-center">Game Mode</h3>
               <div className="flex gap-3 mb-4">
                 <button
                   onClick={() => setTimeControlEnabled(false)}
                   className={`px-6 py-3 rounded transition-colors font-medium ${!timeControlEnabled
                     ? 'bg-green-600 text-white'
-                    : 'bg-white text-black'
+                    : 'bg-white text-black hover:bg-gray-300'
                     }`}
                 >
                   Standard (No Timer)
@@ -629,7 +630,7 @@ const ChessGame = () => {
                   }}
                   className={`px-6 py-3 rounded transition-colors font-medium ${timeControlEnabled
                     ? 'bg-green-600 text-white'
-                    : 'bg-white text-black'
+                    : 'bg-white text-black hover:bg-gray-300'
                     }`}
                 >
                   Timed Game
@@ -645,58 +646,66 @@ const ChessGame = () => {
             </div>
 
             <div className='flex-1'>
-              <h3 className="text-xl font-semibold mb-3 text-center">Select Difficulty</h3>
+              <h3 className="text-xl text-white font-semibold mb-3 text-center">Select Difficulty</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {difficultyOptions.map(option => (
                   <button
                     key={option.value}
                     onClick={() => setDifficulty(option.value)}
                     className={`px-6 py-3 rounded transition-colors font-medium ${difficulty === option.value
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-black hover:bg-gray-300'
                       }`}
                   >
                     {option.label}
                   </button>
                 ))}
               </div>
-              <div className='flex gap-10 justify-between'>
-                <div>Current Difficulty level : {difficulty}</div>
+              <div className='flex gap-1 justify-between text-white'>
+                <div className='flex-1'>Current Difficulty : <span className='text-green-300'> {difficulty}</span></div>
                 <button
                   onClick={() => {
                     setCustomDifficulty(difficulty);
                     setShowDifficultySlider(true);
                   }}
-                  className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                  className="flex-1 text-blue-600 hover:text-blue-800 transition-colors font-medium"
                 >
-                  Advanced: Set Custom Difficulty →
+                  Set Custom Difficulty →
                 </button>
               </div>
             </div>
 
             <div className='flex flex-col flex-1'>
-            <h3 className="text-xl font-semibold mb-3 text-center">Select Hint Limit</h3>
-            <div className="grid grid-cols-5 gap-2 mb-4">
-              {[1, 3, 5, 7, "∞"].map(limit => (
-                <button
-                  key={limit}
-                  onClick={() => setSelectedHintLimit(limit === "∞" ? Number.POSITIVE_INFINITY : limit)}
-                  className={`px-4 py-2 rounded transition-colors font-medium ${selectedHintLimit === (limit === "∞" ? Number.POSITIVE_INFINITY : limit)
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                    }`}
-                >
-                  {limit}
-                </button>
-              ))}
-            </div>
+              <h3 className="text-xl font-semibold mb-3 text-white text-center">Select Hint Limit</h3>
+              <div className="grid grid-cols-5 gap-2 mb-4">
+                {[1, 3, 5, 7, "∞"].map(limit => (
+                  <button
+                    key={limit}
+                    onClick={() => setSelectedHintLimit(limit === "∞" ? Number.POSITIVE_INFINITY : limit)}
+                    className={`px-4 py-2 rounded transition-colors font-medium ${selectedHintLimit === (limit === "∞" ? Number.POSITIVE_INFINITY : limit)
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      }`}
+                  >
+                    {limit}
+                  </button>
+                ))}
+              </div>
+              <div className="w-lg">
+                <p className="text-center text-gray-100 text-sm">
+                  {selectedHintLimit === -1
+                    ? "You'll have unlimited hints during the game"
+                    : `You'll have ${selectedHintLimit} hint${selectedHintLimit !== 1 ? 's' : ''} during the game`
+                  }
+                </p>
+              </div>
             </div>
           </div>
 
           <div className={`fixed right-0 top-0 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-10 ${showDifficultySlider ? 'translate-x-0' : 'translate-x-full'}`} style={{ width: '24rem' }}>
             <div className="p-5">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold">Custom Difficulty</h3>
+                <h3 className="text-xl font-semibold">Custom Difficulty</h3>
                 <button
                   onClick={() => setShowDifficultySlider(false)}
                   className="text-gray-700 hover:text-gray-900"
@@ -708,14 +717,14 @@ const ChessGame = () => {
               </div>
 
               <div className="mb-6">
-                <label className="block mb-2 font-medium text-gray-900">Engine Depth: <span className="font-bold text-blue-600">{customDifficulty}</span></label>
+                <label className="block mb-2 font-medium text-gray-900">Engine Depth: <span className="text-black">{customDifficulty}</span></label>
                 <input
                   type="range"
                   min="1"
                   max="25"
                   value={customDifficulty}
                   onChange={handleCustomDifficultyChange}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-1 bg-gray-200 rounded-sm appearance-none cursor-pointer custom-slider"
                 />
 
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -724,7 +733,7 @@ const ChessGame = () => {
                 </div>
               </div>
 
-              <div className="text-sm text-gray-600 mb-6">
+              <div className="text-sm text-slate-800 my-6">
                 <p className="mb-2"><strong>Engine Depth Explanation:</strong></p>
                 <p className="mb-2">Higher depth values make Stockfish search deeper and play stronger, but calculations take longer.</p>
                 <ul className="list-disc pl-5 space-y-1">
@@ -737,32 +746,25 @@ const ChessGame = () => {
 
               <button
                 onClick={applyCustomDifficulty}
-                className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                className="w-full py-2 px-4 bg-black text-white rounded hover:bg-gray-800 transition-colors"
               >
                 Apply Custom Difficulty
               </button>
             </div>
           </div>
 
-          <div className="w-lg">
-            <p className="text-center text-gray-600 text-sm">
-              {selectedHintLimit === -1
-                ? "You'll have unlimited hints during the game"
-                : `You'll have ${selectedHintLimit} hint${selectedHintLimit !== 1 ? 's' : ''} during the game`
-              }
-            </p>
-          </div>
-          <h2 className="text-2xl font-bold">Choose your color</h2>
+
+          <h2 className="text-2xl font-semibold text-white">Choose your color</h2>
           <div className="flex gap-4">
             <button
               onClick={() => startGame('w')}
-              className="px-6 py-3 text-gray-900 bg-gray-100 rounded hover:bg-gray-200 transition-colors font-bold text-lg"
+              className="px-6 py-3 text-gray-900 bg-white rounded hover:bg-gray-200 transition-colors text-lg"
             >
               Play as White
             </button>
             <button
               onClick={() => startGame('b')}
-              className="px-6 py-3 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors font-bold text-lg"
+              className="px-6 py-3 bg-black border border-white text-white rounded hover:bg-[#101010] transition-colors font-bold text-lg"
             >
               Play as Black
             </button>

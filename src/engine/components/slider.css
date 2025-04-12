@@ -1,0 +1,24 @@
+.custom-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px; /* Adjust the size of the dot */
+    height: 16px; /* Adjust the size of the dot */
+    background-color: black; /* Change the color to black */
+    border-radius: 50%; /* Keep it circular */
+    cursor: pointer;
+  }
+  
+  .custom-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: black;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .custom-slider::-ms-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: black;
+    border-radius: 50%;
+    cursor: pointer;
+  }

@@ -138,14 +138,14 @@ const StockfishStatus = memo(() => {
             className={`px-3 py-1 rounded text-sm transition-colors ${
               isRefreshing 
                 ? 'bg-gray-400 cursor-not-allowed text-white'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                : 'bg-black hover:bg-[#101010] text-white'
             }`}
           >
             {isRefreshing ? 'Refreshing...' : 'Refresh Status'}
           </button>
           
           {isRefreshing && (
-            <div className="mt-2 text-sm text-blue-600 animate-pulse">
+            <div className="mt-2 text-sm text-black animate-pulse">
               Loading data ...
             </div>
           )}

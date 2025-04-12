@@ -15,7 +15,7 @@ const TimeControlSelector = ({ onSelectTimeControl, onCancel, showTimeControl })
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white  text-gray-900 p-6 rounded-sm shadow-lg max-w-md w-full">
-        <h2 className="text-xl mb-4 text-center">Select Time Control</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">Select Time Control</h2>
         
         <div className="grid grid-cols-1 gap-3 mb-4">
           {timeControlOptions.map((option) => (
@@ -24,8 +24,8 @@ const TimeControlSelector = ({ onSelectTimeControl, onCancel, showTimeControl })
               onClick={() => onSelectTimeControl(option)}
               className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded text-left transition-colors border border-black-200"
             >
-              <div className="font-bold">{option.name}</div>
-              <div className="text-sm text-gray-600">{option.description}</div>
+              <div className="">{option.name}</div>
+              <div className="text-xs text-gray-600">{option.description}</div>
             </button>
           ))}
         </div>
@@ -33,7 +33,7 @@ const TimeControlSelector = ({ onSelectTimeControl, onCancel, showTimeControl })
         <div className="flex justify-between">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+            className="px-4 py-2 bg-black text-white hover:bg-slate-800 rounded transition-colors"
           >
             No Time Control
           </button>
