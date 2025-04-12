@@ -60,7 +60,7 @@ export default function LandingHome() {
 
       {showModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-60 z-50">
-          <div className="bg-[rgba(26,26,26,0.9)] text-white rounded-2xl shadow-lg w-[40%] max-w-[500px] h-[40%] max-h-[400px] p-8 flex flex-col items-center justify-between relative animate-fade-in">
+          <div className="bg-[rgba(26,26,26,0.9)] text-white rounded-sm shadow-lg w-[40%] max-w-[500px] h-[40%] max-h-[400px] p-8 flex flex-col items-center justify-between relative animate-fade-in">
             <button 
               onClick={closeModal}
               className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors"
@@ -77,14 +77,14 @@ export default function LandingHome() {
             <div className="flex gap-4">
               <button
                 onClick={() => navigate("/login")}
-                className="px-6 py-3 text-[#d9d9d9] bg-[#6953d6] hover:bg-[#5a45c1] rounded-lg font-medium flex items-center gap-2 transition duration-300 ease-in-out"
+                className="px-6 py-3 text-[#d9d9d9] bg-[#010101] hover:bg-[#101010] rounded-lg font-medium flex items-center gap-2 transition duration-300 ease-in-out"
               >
                 <FiLogIn className="text-xl" />
                 Log in
               </button>
               <button
                 onClick={() => navigate("/signup")}
-                className="px-6 py-3 text-[#d9d9d9] bg-[#2b2b2b] hover:bg-[#3d3d3d] border border-[#d9d9d9a6] rounded-lg font-medium flex items-center gap-2 transition duration-300 ease-in-out"
+                className="px-6 py-3 text-[#010101] bg-[#fff] hover:bg-[#909090] border border-[#d9d9d9a6] rounded-lg font-medium flex items-center gap-2 transition duration-300 ease-in-out"
               >
                 <FiUserPlus className="text-xl" />
                 Sign up

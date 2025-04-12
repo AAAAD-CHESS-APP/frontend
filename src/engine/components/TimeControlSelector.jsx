@@ -14,15 +14,15 @@ const TimeControlSelector = ({ onSelectTimeControl, onCancel, showTimeControl })
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white  text-gray-900 p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4 text-center">Select Time Control</h2>
+      <div className="bg-white  text-gray-900 p-6 rounded-sm shadow-lg max-w-md w-full">
+        <h2 className="text-xl mb-4 text-center">Select Time Control</h2>
         
         <div className="grid grid-cols-1 gap-3 mb-4">
           {timeControlOptions.map((option) => (
             <button
               key={option.name}
               onClick={() => onSelectTimeControl(option)}
-              className="px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded text-left transition-colors border border-blue-200"
+              className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded text-left transition-colors border border-black-200"
             >
               <div className="font-bold">{option.name}</div>
               <div className="text-sm text-gray-600">{option.description}</div>

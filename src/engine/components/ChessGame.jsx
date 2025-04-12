@@ -610,14 +610,14 @@ const ChessGame = () => {
         <div className="flex flex-col items-center gap-2 mb-4">
 
           <div className='flex gap-10 my-10 w-[80rem]'>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold mb-3 text-center">Game Mode</h3>
-              <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className='flex-1'>
+              <h3 className="text-xl text-white mb-3 text-center">Game Mode</h3>
+              <div className="flex gap-3 mb-4">
                 <button
                   onClick={() => setTimeControlEnabled(false)}
                   className={`px-6 py-3 rounded transition-colors font-medium ${!timeControlEnabled
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-black'
                     }`}
                 >
                   Standard (No Timer)
@@ -628,8 +628,8 @@ const ChessGame = () => {
                     setShowTimeControlSelector(true);
                   }}
                   className={`px-6 py-3 rounded transition-colors font-medium ${timeControlEnabled
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-black'
                     }`}
                 >
                   Timed Game
@@ -672,6 +672,24 @@ const ChessGame = () => {
                   Advanced: Set Custom Difficulty →
                 </button>
               </div>
+            </div>
+
+            <div className='flex flex-col flex-1'>
+            <h3 className="text-xl font-semibold mb-3 text-center">Select Hint Limit</h3>
+            <div className="grid grid-cols-5 gap-2 mb-4">
+              {[1, 3, 5, 7, "∞"].map(limit => (
+                <button
+                  key={limit}
+                  onClick={() => setSelectedHintLimit(limit === "∞" ? Number.POSITIVE_INFINITY : limit)}
+                  className={`px-4 py-2 rounded transition-colors font-medium ${selectedHintLimit === (limit === "∞" ? Number.POSITIVE_INFINITY : limit)
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                >
+                  {limit}
+                </button>
+              ))}
+            </div>
             </div>
           </div>
 
@@ -727,21 +745,6 @@ const ChessGame = () => {
           </div>
 
           <div className="w-lg">
-            <h3 className="text-xl font-semibold mb-3 text-center">Select Hint Limit</h3>
-            <div className="grid grid-cols-5 gap-2 mb-4">
-              {[1, 3, 5, 7, "∞"].map(limit => (
-                <button
-                  key={limit}
-                  onClick={() => setSelectedHintLimit(limit === "∞" ? Number.POSITIVE_INFINITY : limit)}
-                  className={`px-4 py-2 rounded transition-colors font-medium ${selectedHintLimit === (limit === "∞" ? Number.POSITIVE_INFINITY : limit)
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                    }`}
-                >
-                  {limit}
-                </button>
-              ))}
-            </div>
             <p className="text-center text-gray-600 text-sm">
               {selectedHintLimit === -1
                 ? "You'll have unlimited hints during the game"
