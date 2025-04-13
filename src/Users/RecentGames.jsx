@@ -362,19 +362,21 @@ export default function RecentGames() {
                                 <h4 className="font-bold text-gray-900 mb-3">Move History</h4>
                                 {selectedGame.moves && selectedGame.moves.length > 0 ? (
                                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                    <div className="grid grid-cols-2 gap-2">
-                                      {selectedGame.moves.map((moveData, idx) => (
-                                        <div key={idx} className="flex items-center p-2 border-b border-gray-100">
-                                          <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 ${moveData.color === 'white' ? 'bg-gray-100' : 'bg-gray-700 text-white'
-                                            }`}>
-                                            {idx + 1}
+                                    <div className="h-40 overflow-y-auto pr-2" style={{ maxHeight: '10rem' }}>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {selectedGame.moves.map((moveData, idx) => (
+                                          <div key={idx} className="flex items-center p-2 border-b border-gray-100">
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 ${moveData.color === 'white' ? 'bg-gray-100' : 'bg-gray-700 text-white'
+                                              }`}>
+                                              {idx + 1}
+                                            </div>
+                                            <span className="font-mono">
+                                              {moveData.color === 'white' ? 'White: ' : 'Black: '}
+                                              {moveData.move?.join(' ') || '-'}
+                                            </span>
                                           </div>
-                                          <span className="font-mono">
-                                            {moveData.color === 'white' ? 'White: ' : 'Black: '}
-                                            {moveData.move?.join(' ') || '-'}
-                                          </span>
-                                        </div>
-                                      ))}
+                                        ))}
+                                      </div>
                                     </div>
                                   </div>
                                 ) : (
@@ -385,22 +387,24 @@ export default function RecentGames() {
                               {selectedGame.pgn && selectedGame.pgn.length > 0 && (
                                 <div>
                                   <h4 className="font-bold text-gray-900 mb-3">Game Positions (FEN)</h4>
-                                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto">
-                                    {selectedGame.pgn.map((fen, idx) => (
-                                      <div key={idx} className="mb-2 pb-2 border-b border-gray-100">
-                                        <div className="flex items-center mb-1">
-                                          <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                                            {idx + 1}
-                                          </span>
-                                          <span className="text-sm font-medium">
-                                            {idx === 0 ? 'Initial Position' : `After move ${idx}`}
-                                          </span>
+                                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <div className="h-40 overflow-y-auto pr-2" style={{ maxHeight: '10rem' }}>
+                                      {selectedGame.pgn.map((fen, idx) => (
+                                        <div key={idx} className="mb-2 pb-2 border-b border-gray-100">
+                                          <div className="flex items-center mb-1">
+                                            <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                                              {idx + 1}
+                                            </span>
+                                            <span className="text-sm font-medium">
+                                              {idx === 0 ? 'Initial Position' : `After move ${idx}`}
+                                            </span>
+                                          </div>
+                                          <code className="block font-mono text-xs text-gray-600 whitespace-nowrap overflow-x-auto p-1">
+                                            {fen}
+                                          </code>
                                         </div>
-                                        <code className="block font-mono text-xs text-gray-600 whitespace-nowrap overflow-x-auto p-1">
-                                          {fen}
-                                        </code>
-                                      </div>
-                                    ))}
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
                               )}

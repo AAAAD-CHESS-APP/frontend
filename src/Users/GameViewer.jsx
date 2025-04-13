@@ -42,7 +42,7 @@ const GameViewer = ({ gameData, onClose }) => {
   const goToEnd = () => setCurrentPosition(positions.length - 1);
   const goToPrevious = () => setCurrentPosition(prev => Math.max(0, prev - 1));
   const goToNext = () => setCurrentPosition(prev => Math.min(positions.length - 1, prev + 1));
-  const goToMove = (index) => setCurrentPosition(Math.min(index + 1, positions.length - 1));
+  const goToMove = (index) => setCurrentPosition(index);
 
   // Custom pieces with your project's piece images
   const customPieces = {
@@ -153,7 +153,7 @@ const GameViewer = ({ gameData, onClose }) => {
                   key={idx} 
                   onClick={() => goToMove(idx)}
                   className={`flex items-center p-2 border-b border-gray-100 cursor-pointer hover:bg-gray-100 ${
-                    idx === currentPosition - 1 ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                    idx === currentPosition ? 'bg-blue-100 border-l-4 border-blue-500' : ''
                   }`}
                 >
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 ${

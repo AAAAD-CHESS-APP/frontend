@@ -137,7 +137,7 @@ export default function ChessBoard() {
     <div>
       <Chessboard
         position={fen}
-        boardWidth={650}
+        boardWidth={750}
         customDarkSquareStyle={{
           backgroundColor: "#888c94",
         }}

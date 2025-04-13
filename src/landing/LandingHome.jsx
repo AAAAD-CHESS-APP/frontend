@@ -13,9 +13,9 @@ export default function LandingHome() {
   const navigate = useNavigate();
 
   const playbutton = [
-    { id: 1, text: "play with bot", icon: <GoHubot className="text-4xl" /> },
-    { id: 2, text: "play Local", icon: <FaUsers className="text-4xl" /> },
-    { id: 3, text: "play online", icon: <RiBaseStationLine className="text-4xl" /> },
+    { id: 1, text: "play with bot", icon: <GoHubot className="text-6xl" /> },
+    { id: 2, text: "play Local", icon: <FaUsers className="text-6xl" /> },
+    { id: 3, text: "play online", icon: <RiBaseStationLine className="text-6xl" /> },
   ];
 
   const handleButtonClick = (id) => {
@@ -48,8 +48,8 @@ export default function LandingHome() {
             <button
               onClick={() => handleButtonClick(button.id)}
               key={button.id}
-              className="capitalize text-3xl text-[#d9d9d9] bg-[rgba(26,26,26,0.5)] rounded-md 
-              text-center m-4 p-7 w-[330px] flex items-center gap-4 shadow-md hover:text-[#010101] hover:bg-[#fff] transition duration-500 ease-in-out"
+              className="capitalize text-5xl text-[#d9d9d9] bg-[rgba(26,26,26,0.5)] rounded-md 
+              text-center m-4 p-7 w-[30rem] flex items-center gap-8 shadow-md hover:text-[#010101] hover:bg-[#fff] transition duration-500 ease-in-out"
             >
               {button.icon}
               {button.text}

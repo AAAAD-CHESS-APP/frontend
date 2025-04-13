@@ -24,45 +24,45 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-transparent fixed top-0 left-0 w-full px-6 py-4 flex items-center justify-between z-50">
+    <nav className="bg-transparent fixed top-0 left-0 w-full px-6 py-4 mt-4 mr-10 flex items-center justify-between z-50">
       <div className="flex items-center">
-        <img src="/LOGO_White.png" alt="" className="h-12 ml-10" />
+        <img src="/LOGO_White.png" alt="" className="h-24 ml-24" />
       </div>
       <div className="flex items-center gap-4">
         {user && (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={goToDashboard}
-              className="bg-white border border-black text-black hover:bg-transparent hover:border hover:border-white hover:text-[#fff] transition-all duration-400 px-4 py-2 rounded-md font-medium flex items-center gap-2"
+              className="bg-white border border-black text-black text-2xl hover:bg-transparent hover:border hover:border-white hover:text-[#fff] transition-all duration-400 px-6 py-3 rounded-md font-medium flex items-center gap-2"
             >
-              <MdDashboard className="text-lg" />
+              <MdDashboard className="text-3xl" />
               Dashboard
             </button>
 
             <button
               onClick={logout}
-              className="bg-transparent hover:bg-white hover:text-black border border-white text-white transition-all duration-400 px-4 py-2 rounded-md font-medium flex items-center gap-2"
+              className="bg-transparent hover:bg-white text-2xl hover:text-black border border-white text-white transition-all duration-400 px-6 py-3 rounded-md font-medium flex items-center gap-2"
             >
-              <RxLinkBreak2 className="text-lg" />
+              <RxLinkBreak2 className="text-3xl" />
               Log out
             </button>
           </div>
         )}
         {!user && (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => navigate("/login")}
-              className="bg-transparent hover:bg-white border border-white hover:text-black text-white transition-all duration-400 px-4 py-2 rounded-md font-medium flex items-center gap-2"
+              className="bg-transparent hover:bg-white text-2xl border border-white hover:text-black text-white transition-all duration-400 px-6 py-3 rounded-md font-medium flex items-center gap-2"
             >
-              <RiCharacterRecognitionLine className="text-lg" />
+              <RiCharacterRecognitionLine className="text-3xl" />
               Log in
             </button>
 
             <button
               onClick={() => navigate("/signup")}
-              className="bg-white border border-black text-black hover:bg-transparent hover:border hover:border-white hover:text-[#fff] transition-all duration-400 px-4 py-2 rounded-md font-medium flex items-center gap-2"
+              className="bg-white border border-black text-2xl text-black hover:bg-transparent hover:border hover:border-white hover:text-[#fff] transition-all duration-400 px-6 py-3 rounded-md font-medium flex items-center gap-2"
             >
-              <RiVoiceRecognitionLine className="text-lg" />
+              <RiVoiceRecognitionLine className="text-3xl" />
               Sign up
             </button>
           </div>
