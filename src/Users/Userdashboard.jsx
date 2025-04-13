@@ -208,11 +208,11 @@ export default function Userdashboard() {
     <div className="bg-white flex h-screen overflow-hidden">
       <div className="w-full text-black py-4 px-20 fixed top-0 left-0 z-10 flex justify-between items-center">
         <button
-          onClick={() => navigate("/game")}
+          onClick={() => navigate("/")}
           className="bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 flex items-center gap-2"
         >
           <MdGames size={18} />
-          Play Game
+          Home
         </button>
         <div className="flex items-center gap-4">
           <div className="bg-black text-white py-2 px-4 rounded-md flex items-center gap-2">
@@ -458,7 +458,7 @@ export default function Userdashboard() {
                   </button>
 
                   <button
-                    onClick={() => navigate("/update-password/" + userData.id)}
+                    onClick={() => navigate("/dashboard-pannel/update-password/" + userData.id)}
                     className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-all"
                   >
                     <div className="flex items-center">

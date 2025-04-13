@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Squares from "./Background";
+import Squares from "../Authentication/Background";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function UpdatePassword() {
+export default function UserUpdatePassword() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +17,16 @@ export default function UpdatePassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        password
+      )
+    ) {
+      setError(
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+      );
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
@@ -24,14 +34,30 @@ export default function UpdatePassword() {
     }
 
     try {
-      await axios.patch(`http://localhost:8080/api/resetPassword/${id}`, {
-        password,
-        confirmPass: confirmPassword,
-      });
+      const token = localStorage.getItem("token");
+
+      await axios.patch(
+        `http://localhost:8080/api/user/password/${id}`,
+        {
+          password,
+          confirmPass: confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "An error occurred.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError(
+          "Password update failed. Make sure your password meets the requirements."
+        );
+      }
     }
   };
 
@@ -57,10 +83,10 @@ export default function UpdatePassword() {
               You can now log in with your new password.
             </p>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/dashboard-pannel")}
               className="w-full bg-[#000814] hover:bg-[#1a1a1a] text-white py-3 px-4 rounded-lg text-sm font-semibold mt-4"
             >
-              Login Now
+              Back to dashboard
             </button>
           </>
         ) : (
