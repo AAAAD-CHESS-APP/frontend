@@ -4,6 +4,7 @@ import { FiChevronLeft, FiDownload, FiFilter } from 'react-icons/fi';
 import { MdGames, MdLeaderboard } from 'react-icons/md';
 import { userAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 export default function RecentGames() {
   const { playerId } = useParams();
@@ -19,45 +20,15 @@ export default function RecentGames() {
       try {
         setIsLoading(true);
         const token = localStorage.getItem('token');
-        const playerResponse = await userAPI.getUserById(playerId, token);
-        if (playerResponse && playerResponse.data) {
-          setPlayerName(playerResponse.data.name || 'Player');
+        const response = await axios.get('http://localhost:8080/api/userGames', {
+          headers: {
+          Authorization: `Bearer ${token}`
+          }
+        });
+        console.log(response.data);
+
         }
-        const response = await userAPI.getGameHistory(playerId, token);
-        
-        if (response && response.data) {
-          const formattedGames = response.data.map(game => {
-            const isPlayerWhite = game.white === playerId;
-            const playerColor = isPlayerWhite ? 'White' : 'Black';
-            const opponent = isPlayerWhite ? game.blackName : game.whiteName;
-            let result = 'Draw';
-            if (game.result) {
-              if ((game.result.includes('White') && isPlayerWhite) || 
-                  (game.result.includes('Black') && !isPlayerWhite)) {
-                result = 'Win';
-              } else if ((game.result.includes('White') && !isPlayerWhite) || 
-                         (game.result.includes('Black') && isPlayerWhite)) {
-                result = 'Loss';
-              }
-            }
-            
-            return {
-              id: game._id,
-              date: new Date(game.startTime),
-              opponent,
-              playerColor,
-              result,
-              moves: game.moves || [],
-              gameType: 'Standard',
-              pgn: game.pgn || []
-            };
-          });
-          
-          setGames(formattedGames);
-        } else {
-          setError('Failed to load game history');
-        }
-      } catch (err) {
+         catch (err) {
         console.error('Error fetching game history:', err);
         setError('Error loading games. Please try again later.');
         toast.error('Failed to load game history');
