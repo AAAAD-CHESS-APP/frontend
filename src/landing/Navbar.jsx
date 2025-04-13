@@ -26,7 +26,7 @@ export default function Navbar() {
   return (
     <nav className="bg-transparent fixed top-0 left-0 w-full px-6 py-4 mt-4 mr-10 flex items-center justify-between z-50">
       <div className="flex items-center">
-        <img src="/LOGO_White.png" alt="" className="h-24 ml-24" />
+        <img src="/LOGO_White.png" alt="" className="h-20 ml-24" />
       </div>
       <div className="flex items-center gap-4">
         {user && (

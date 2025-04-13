@@ -417,7 +417,7 @@ function LocalGame() {
 
           <div className="flex flex-col lg:flex-row bg-gray-900">
             {/* Main chess board area */}
-            <div className="lg:w-2/3 p-6 bg-gray-900" ref={boardContainerRef}>
+            <div className="lg:w-2/3 p-6 bg-black" ref={boardContainerRef}>
               {/* Player info and timers */}
               <div className="flex justify-between items-center mb-4">
                 <div className={`flex-1 px-4 py-2 rounded-lg ${player === 'white' && isTimerRunning
@@ -489,7 +489,7 @@ function LocalGame() {
             </div>
 
             {/* Move history sidebar */}
-            <div className="lg:w-1/3 bg-gray-800 border-l border-gray-700">
+            <div className="lg:w-1/3 bg-black border-l border-gray-700">
               <div className="p-4 border-b border-gray-700">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-bold text-lg flex items-center text-white">
@@ -503,7 +503,7 @@ function LocalGame() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setActiveTab("pgn")}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${activeTab === 'pgn'
+                    className={`px-2 py-1 text-md rounded transition-colors ${activeTab === 'pgn'
                       ? 'bg-gray-600 text-white'
                       : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                       }`}
@@ -512,7 +512,7 @@ function LocalGame() {
                   </button>
                   <button
                     onClick={() => setActiveTab("fen")}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${activeTab === 'fen'
+                    className={`px-2 py-1 text-md rounded transition-colors ${activeTab === 'fen'
                       ? 'bg-gray-600 text-white'
                       : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                       }`}

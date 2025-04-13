@@ -1,4 +1,4 @@
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import toast from 'react-hot-toast';
@@ -33,7 +33,7 @@ function OnlineGame() {
 
     const roomNameRef = useRef(RoomName);
     useEffect(() => {
-        roomNameRef.current =RoomName;
+        roomNameRef.current = RoomName;
     }, [RoomName]);
 
     // const [turn, setTurn] = useState(0);
@@ -49,7 +49,7 @@ function OnlineGame() {
     const [showfens, setShowfens] = useState(true);
     const [pgns, setPgns] = useState([]);
     const [showPng, setShowPng] = useState(false);
-    const [gameEnded,setGameEnded] = useState(false);
+    const [gameEnded, setGameEnded] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -109,74 +109,74 @@ function OnlineGame() {
 
 
     const notify = (txt) => toast.error(txt);
-    
+
 
     const onDrop = async (sourceSquare, targetSquare) => {
-        try{
-        if ((color === 'white' && game.turn() === 'w') || (color === 'black' && game.turn() === 'b')) {
+        try {
+            if ((color === 'white' && game.turn() === 'w') || (color === 'black' && game.turn() === 'b')) {
 
-            const move = game.move({
-                from: sourceSquare, to: targetSquare,
-                promotion: game.get(sourceSquare)?.type === 'p' && (targetSquare[1] === '8' || targetSquare[1] === '1') ? 'q' : undefined
-            });
-
-            if (move) {
-                socket.emit('move-played', {
-                    fen: game.fen(),
-                    roomName: RoomName,
-                    playedBy: user,
-                    color: color,
-                    move: game.history(),
-                    pgn: game.pgn()
+                const move = game.move({
+                    from: sourceSquare, to: targetSquare,
+                    promotion: game.get(sourceSquare)?.type === 'p' && (targetSquare[1] === '8' || targetSquare[1] === '1') ? 'q' : undefined
                 });
 
-                setGame(new Chess(game.fen()));
-                const fen = game.fen();
-                sessionStorage.setItem('online-game', fen);
-                if (game.isCheckmate()) {
-                    const winner = move.color === "w" ? "White" : "Black";
-                    await new Promise((resolve) => {
-                    socket.emit('game-over', { roomName: RoomName, result: `${winner} wins by checkmate` },resolve);
-                });
-                    clearSessionStorage();
-                    // navigate('/home');
-                    navigate(`/game/result/${roomNameRef.current}`);
-                    setGameEnded(true);
-                } else if (game.isStalemate()) {
-                    await new Promise((resolve) => {
-                        socket.emit('game-over', { roomName: RoomName, result: `stalemate` },resolve);
+                if (move) {
+                    socket.emit('move-played', {
+                        fen: game.fen(),
+                        roomName: RoomName,
+                        playedBy: user,
+                        color: color,
+                        move: game.history(),
+                        pgn: game.pgn()
                     });
-                    clearSessionStorage();
-                   // navigate('/home');
-                   navigate(`/game/result/${roomNameRef.current}`);
-                   setGameEnded(true);
 
-                } else if (game.isDraw()) {
-                    await new Promise((resolve) => {
-                        socket.emit('game-over', { roomName: RoomName, result: `draw` },resolve);
-                    });
-                    clearSessionStorage();
-                    // navigate('/home');
-                    navigate(`/game/result/${roomNameRef.current}`);
-                    setGameEnded(true);
+                    setGame(new Chess(game.fen()));
+                    const fen = game.fen();
+                    sessionStorage.setItem('online-game', fen);
+                    if (game.isCheckmate()) {
+                        const winner = move.color === "w" ? "White" : "Black";
+                        await new Promise((resolve) => {
+                            socket.emit('game-over', { roomName: RoomName, result: `${winner} wins by checkmate` }, resolve);
+                        });
+                        clearSessionStorage();
+                        // navigate('/home');
+                        navigate(`/game/result/${roomNameRef.current}`);
+                        setGameEnded(true);
+                    } else if (game.isStalemate()) {
+                        await new Promise((resolve) => {
+                            socket.emit('game-over', { roomName: RoomName, result: `stalemate` }, resolve);
+                        });
+                        clearSessionStorage();
+                        // navigate('/home');
+                        navigate(`/game/result/${roomNameRef.current}`);
+                        setGameEnded(true);
+
+                    } else if (game.isDraw()) {
+                        await new Promise((resolve) => {
+                            socket.emit('game-over', { roomName: RoomName, result: `draw` }, resolve);
+                        });
+                        clearSessionStorage();
+                        // navigate('/home');
+                        navigate(`/game/result/${roomNameRef.current}`);
+                        setGameEnded(true);
+                    }
+
+                    sessionStorage.setItem("game", game.fen());
+                    setFens(prevFens => [...prevFens, game.fen()]);
+                    setPgns(prevPgn => [...prevPgn, game.pgn()]);
                 }
-
-                sessionStorage.setItem("game", game.fen());
-                setFens(prevFens => [...prevFens, game.fen()]);
-                setPgns(prevPgn => [...prevPgn, game.pgn()]);
             }
+            else notify("Not Your Turn Nigger");
+        } catch (err) {
+            notify("Invalid Move");
         }
-        else notify("Not Your Turn Nigger");
-    }catch(err){
-        notify("Invalid Move");
-    }
     };
 
 
 
     async function resign() {
         await new Promise((resolve) => {
-            socket.emit('resign',  { roomName: RoomName, user: user, color: color },resolve);
+            socket.emit('resign', { roomName: RoomName, user: user, color: color }, resolve);
         });
         toast.success(`${color} resigned`);
         clearSessionStorage();
@@ -262,19 +262,19 @@ function OnlineGame() {
 
     const renderPngs = pgns.map((pgn, index) => {
         const moves = pgn
-          .split('\n')                      
-          .filter(line => !line.startsWith('[')) 
-          .join(' ') 
-          .replace(/\*/g, '') 
-          .replace(/\.\.\./g, '')                      
-          .trim();                    
-      
+            .split('\n')
+            .filter(line => !line.startsWith('['))
+            .join(' ')
+            .replace(/\*/g, '')
+            .replace(/\.\.\./g, '')
+            .trim();
+
         return (
-          <p className="text-gray-600 " key={index}>
-            {moves}
-          </p>
+            <p className="text-gray-600 " key={index}>
+                {moves}
+            </p>
         );
-      });
+    });
     const renderMessages = messages.map((msg, index) => {
         return (<div key={index} className=" rounded-sm">
             {/* <p className={` ${msg.user === user ? 'text-green-600' : 'text-orange-500'}`} >{msg.user}</p> */}
@@ -298,100 +298,101 @@ function OnlineGame() {
 
     const customPieces = {
         wP: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/wp.png"
-            alt="White Pawn"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/wp.png"
+                alt="White Pawn"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         wR: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/wr.png"
-            alt="White Rook"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/wr.png"
+                alt="White Rook"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         wN: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/wn.png"
-            alt="White Knight"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/wn.png"
+                alt="White Knight"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         wB: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/wb.png"
-            alt="White Bishop"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/wb.png"
+                alt="White Bishop"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         wQ: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/wq.png"
-            alt="White Queen"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/wq.png"
+                alt="White Queen"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         wK: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/wk.png"
-            alt="White King"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/wk.png"
+                alt="White King"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         bP: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/bp.png"
-            alt="Black Pawn"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/bp.png"
+                alt="Black Pawn"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         bR: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/br.png"
-            alt="Black Rook"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/br.png"
+                alt="Black Rook"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         bN: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/bn.png"
-            alt="Black Knight"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/bn.png"
+                alt="Black Knight"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         bB: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/bb.png"
-            alt="Black Bishop"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/bb.png"
+                alt="Black Bishop"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         bQ: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/bq.png"
-            alt="Black Queen"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/bq.png"
+                alt="Black Queen"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
         bK: ({ squareWidth }) => (
-          <img
-            src="/assets/pieces/bk.png"
-            alt="Black King"
-            style={{ width: squareWidth, height: squareWidth }}
-          />
+            <img
+                src="/assets/pieces/bk.png"
+                alt="Black King"
+                style={{ width: squareWidth, height: squareWidth }}
+            />
         ),
-      };
+    };
 
-      function cancelSearchAndReturnToDashBoard(){
+    function cancelSearchAndReturnToDashBoard() {
         stopSearchingForThisUser();
         navigate("/dashboard-pannel")
-      }
+    }
 
     return (
         <div>
             {RoomName &&
-                <div className="flex items-center justify-around bg-[#121212] h-[100vh]">
+                <div className="flex items-center justify-around bg-gray-50 bg-cover bg-center bg-no-repeat h-[100vh]"
+                    style={{ backgroundImage: 'url("/bg1.jpg")' }}>
                     <div className="bg-[#F3F4F6] w-[28%] flex flex-col p-4 text-white rounded-sm">
                         <p className="text-xl text-black font-semibold border-b-2 pb-2">{user === whitePlayer ? blackPlayer : whitePlayer}</p>
                         <ScrollToBottom className="h-[480px] overflow-x-auto whitespace-normal p-2">
@@ -400,32 +401,31 @@ function OnlineGame() {
                             </div>
                         </ScrollToBottom>
                         <div className="flex items-center justify-center bg-[#ebeaea] p-2 px-3 relative bottom-0 text-black border rounded-sm border-gray-300 ">
-                        <input className="outline-none w-[90%] bg-[#ebeaea]"
-                            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                            onChange={(e) => setMessage(e.target.value)}
-                            value={message}
-                            placeholder="Type To Chat"
-                        > </input>
-                         <LuSend
-                        className="ml-2 text-2xl cursor-pointer text-gray-500"
-                        onClick={sendMessage}
-                        />
+                            <input className="outline-none w-[90%] bg-[#ebeaea]"
+                                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                                onChange={(e) => setMessage(e.target.value)}
+                                value={message}
+                                placeholder="Type To Chat"
+                            > </input>
+                            <LuSend
+                                className="ml-2 text-2xl cursor-pointer text-gray-500"
+                                onClick={sendMessage}
+                            />
                         </div>
                     </div>
                     <div className="flex justify-center flex-col items-center mt-10">
                         <div className="flex flex-row justify-between w-full text-white">
-                            <div className={`${
-                        (color === 'white' && game.turn() === 'w') || 
-                        (color === 'black' && game.turn() === 'b') 
-                        ? 'text-white' 
-                        : 'text-green-600 font-semibold'
-                    }`}>
-                        
-                        <div className="flex justify-center items-center gap-2 mb-1">
-                        <img src={`https://ui-avatars.com/api/?name=${user === whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
-                        {user === whitePlayer ? blackPlayer : whitePlayer}
-                        </div>
-                    </div>
+                            <div className={`${(color === 'white' && game.turn() === 'w') ||
+                                    (color === 'black' && game.turn() === 'b')
+                                    ? 'text-white'
+                                    : 'text-green-600 font-semibold'
+                                }`}>
+
+                                <div className="flex justify-center items-center gap-2 mb-1">
+                                    <img src={`https://ui-avatars.com/api/?name=${user === whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
+                                    {user === whitePlayer ? blackPlayer : whitePlayer}
+                                </div>
+                            </div>
                             <div>10:00</div>
                         </div>
                         <div>
@@ -438,27 +438,26 @@ function OnlineGame() {
                                 customBoardStyle={{
                                     borderRadius: "0.25rem",
                                     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                                  }}
-                                  customDarkSquareStyle={{
+                                }}
+                                customDarkSquareStyle={{
                                     backgroundColor: "#888c95",
-                                  }}
-                                  customLightSquareStyle={{
+                                }}
+                                customLightSquareStyle={{
                                     backgroundColor: "#efeceb",
-                                  }}
-                                  customPieces={customPieces}
+                                }}
+                                customPieces={customPieces}
                             />
                         </div>
                         <div className="flex flex-row justify-between w-full text-white">
-                            <div className={`${
-                            (color === 'white' && game.turn() === 'w') || 
-                            (color === 'black' && game.turn() === 'b') 
-                             ? 'text-green-600  font-semibold' 
-                            : 'text-white'
-                        }`}>
-                            <div className="flex justify-center items-center gap-2 mt-3">
-                             <img src={`https://ui-avatars.com/api/?name=${user !== whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
-                            {user} (You)
-                            </div>
+                            <div className={`${(color === 'white' && game.turn() === 'w') ||
+                                    (color === 'black' && game.turn() === 'b')
+                                    ? 'text-green-600  font-semibold'
+                                    : 'text-white'
+                                }`}>
+                                <div className="flex justify-center items-center gap-2 mt-3">
+                                    <img src={`https://ui-avatars.com/api/?name=${user !== whitePlayer ? blackPlayer : whitePlayer}`} className="rounded-full h-[30px]" />
+                                    {user} (You)
+                                </div>
                             </div>
                             <div>10:00</div>
                         </div>
@@ -486,7 +485,8 @@ function OnlineGame() {
             }
             {
                 !RoomName &&
-                <div className="flex justify-center items-center bg-gradient-to-b from-gray-50 to-gray-100 h-[100vh]">
+                <div className="flex justify-center items-center bg-gray-50 bg-cover bg-center bg-no-repeat h-[100vh]"
+                    style={{ backgroundImage: 'url("/bg1.jpg")' }}>
                     <div className="bg-white border border-gray-200 rounded-xl shadow-md p-8 max-w-2xl w-full mx-4 transform transition duration-500">
                         <div className="text-center mb-8">
                             <div className="inline-block mb-4">
@@ -497,12 +497,12 @@ function OnlineGame() {
                             <h2 className="text-3xl font-bold text-gray-900 mb-2">Finding an Opponent</h2>
                             <p className="text-gray-500">We're matching you with a player of similar skill</p>
                         </div>
-                        
+
                         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-6 mb-8 border border-gray-100 shadow-inner">
                             <div className="flex items-center">
                                 <div className="hidden md:block">
                                     <svg className="w-10 h-10 text-gray-300 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M12 5v14m-7-7h14"/>
+                                        <path d="M12 5v14m-7-7h14" />
                                     </svg>
                                 </div>
                                 <blockquote className="text-lg italic text-gray-700 relative">
@@ -512,7 +512,7 @@ function OnlineGame() {
                                 </blockquote>
                             </div>
                         </div>
-                        
+
                         <div className="flex flex-col items-center gap-6">
                             <div className="flex flex-col items-center gap-3 bg-gray-50 py-4 px-8 rounded-lg w-full">
                                 <div className="flex items-center justify-center gap-3 text-gray-700 font-medium mb-1">
@@ -531,10 +531,10 @@ function OnlineGame() {
                                     data-testid="loader"
                                 />
                             </div>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-                                <button 
-                                    onClick={stopSearchingBtnClicked} 
+                                <button
+                                    onClick={stopSearchingBtnClicked}
                                     className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 active:scale-98 transition-all flex items-center justify-center gap-2 shadow-sm"
                                 >
                                     <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -543,8 +543,8 @@ function OnlineGame() {
                                     </svg>
                                     Cancel Search
                                 </button>
-                                <button 
-                                    onClick={cancelSearchAndReturnToDashBoard} 
+                                <button
+                                    onClick={cancelSearchAndReturnToDashBoard}
                                     className="w-full border border-gray-300 text-gray-700 py-3 rounded-md hover:bg-gray-50 active:scale-98 transition-all flex items-center justify-center gap-2"
                                 >
                                     <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -555,7 +555,7 @@ function OnlineGame() {
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div className="mt-8 text-center text-sm text-gray-500">
                             <p>Average wait time: ~30 seconds</p>
                         </div>

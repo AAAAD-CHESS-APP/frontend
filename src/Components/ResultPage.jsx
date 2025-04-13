@@ -5,9 +5,9 @@ import { useParams } from "react-router-dom";
 const ResultPage = () => {
     const { roomId } = useParams();
   return (
-    <div className="absolute inset-0 w-full backdrop-blur-sm bg-white">
+    <div className="absolute inset-0 w-full backdrop-blur-sm bg-black">
       <div className="flex items-center justify-center h-full">
-        <div className="bg-white p-6">
+        <div className="bg-black p-6">
           <Result roomId={roomId} />
         </div>
       </div>

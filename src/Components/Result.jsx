@@ -54,7 +54,7 @@ function Result({ roomId }) {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white px-4">
+    <div className="flex justify-center items-center min-h-screen bg-black">
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm max-w-md w-full">
         <div className="p-6">
           <div className="flex justify-center mb-4">
