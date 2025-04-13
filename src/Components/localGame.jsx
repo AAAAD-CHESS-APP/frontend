@@ -13,6 +13,93 @@ function LocalGame() {
         return new Chess();
     });
 
+    const customPieces = {
+        wP: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wp.png"
+            alt="White Pawn"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wR: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wr.png"
+            alt="White Rook"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wN: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wn.png"
+            alt="White Knight"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wB: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wb.png"
+            alt="White Bishop"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wQ: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wq.png"
+            alt="White Queen"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        wK: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/wk.png"
+            alt="White King"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bP: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bp.png"
+            alt="Black Pawn"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bR: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/br.png"
+            alt="Black Rook"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bN: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bn.png"
+            alt="Black Knight"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bB: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bb.png"
+            alt="Black Bishop"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bQ: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bq.png"
+            alt="Black Queen"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+        bK: ({ squareWidth }) => (
+          <img
+            src="/assets/pieces/bk.png"
+            alt="Black King"
+            style={{ width: squareWidth, height: squareWidth }}
+          />
+        ),
+      };
+
     const [player, setPlayer] = useState("white");
     const params = useParams();
     const [fen, setFen] = useState(game.fen());
@@ -184,8 +271,20 @@ function LocalGame() {
     });
 
     const renderPngs = pgns.map((pgn, index) => {
-        return <p className="text-gray-600" key={index}>{pgn}</p>
-    });
+        const moves = pgn
+          .split('\n')                      
+          .filter(line => !line.startsWith('[')) 
+          .join(' ') 
+          .replace(/\*/g, '') 
+          .replace(/\.\.\./g, '')                      
+          .trim();                    
+      
+        return (
+          <p className="text-gray-600 " key={index}>
+            {moves}
+          </p>
+        );
+      });
 
     function toggleToFen() {
         setShowPng(false);
@@ -223,25 +322,26 @@ function LocalGame() {
                             customLightSquareStyle={{
                                 backgroundColor: "#f0ecec",
                             }}
+                            customPieces={customPieces}
                         />
                         <div className="flex justify-center mt-10 mb-10">
-                            <button className="bg-[#EF4444] p-2 text-white font-bold rounded-sm" onClick={resetBoard}>
+                            <button className="bg-red-500 text-white px-3 py-1 mt-2 rounded-sm" onClick={resetBoard}>
                                 Reset Board
                             </button>
                         </div>
                     </div>
                     <div className="bg-[#F3F4F6] w-[25%] h-[400px] p-4 text-white relative break-words mt-5">
                         <div className="flex flex-row justify-center gap-2">
-                            <div className={`${showfens ? `bg-blue-600` : `bg-blue-500`} pl-2 pr-2 pt-1 pb-1 rounded-sm cursor-pointer`} onClick={toggleToFen}>
+                            <div className={`${showfens ? `bg-green-600` : `bg-black`} px-6 py-1 rounded-md cursor-pointer`} onClick={toggleToFen}>
                                 fen
                             </div>
-                            <div className={`${showPng ? `bg-blue-600` : `bg-blue-500`} pl-2 pr-2 pt-1 pb-1 rounded-sm cursor-pointer`} onClick={toggleToPgn}>
+                            <div className={`${showPng ? `bg-green-600` : `bg-black`} px-6 py-1 rounded-md cursor-pointer`} onClick={toggleToPgn}>
                                 pgn
                             </div>
                         </div>
                         <ScrollToBottom className="h-[350px] whitespace-normal p-2">
                             {showfens && <div className="flex gap-4 flex-col">{renderFens}</div>}
-                            {showPng && <div className="flex gap-4 flex-col">{renderPngs}</div>}
+                            {showPng && <div className="flex gap-2 flex-row flex-wrap">{renderPngs}</div>}
                         </ScrollToBottom>
                     </div>
                 </div>

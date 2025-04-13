@@ -261,9 +261,20 @@ function OnlineGame() {
     })
 
     const renderPngs = pgns.map((pgn, index) => {
-        return <p className="text-gray-600" key={index}>{pgn}</p>
-    })
-
+        const moves = pgn
+          .split('\n')                      
+          .filter(line => !line.startsWith('[')) 
+          .join(' ') 
+          .replace(/\*/g, '') 
+          .replace(/\.\.\./g, '')                      
+          .trim();                    
+      
+        return (
+          <p className="text-gray-600 " key={index}>
+            {moves}
+          </p>
+        );
+      });
     const renderMessages = messages.map((msg, index) => {
         return (<div key={index} className=" rounded-sm">
             {/* <p className={` ${msg.user === user ? 'text-green-600' : 'text-orange-500'}`} >{msg.user}</p> */}
@@ -464,7 +475,7 @@ function OnlineGame() {
                                 {renderFens}
                             </div>
                             }
-                            {showPng && <div className="flex gap-4 flex-col">
+                            {showPng && <div className="flex gap-2 flex-row flex-wrap">
                                 {renderPngs}
                             </div>
                             }
