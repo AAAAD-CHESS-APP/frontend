@@ -105,7 +105,7 @@ function Result({ roomId }) {
           
           <div className="grid grid-cols-2 gap-4">
             <button 
-              onClick={() => navigate('/home')} 
+              onClick={() => navigate('/')} 
               className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 transition-all"
             >
               <FiHome size={16} />

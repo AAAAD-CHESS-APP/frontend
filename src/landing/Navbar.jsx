@@ -16,7 +16,7 @@ export default function Navbar() {
   function logout() {
     localStorage.removeItem("token");
     setUser("");
-    navigate("/home");
+    navigate("/");
   }
 
   function goToDashboard() {

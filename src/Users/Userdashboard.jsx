@@ -119,7 +119,7 @@ export default function Userdashboard() {
     localStorage.removeItem("token");
     setUser("");
     toast.success("Logged out successfully");
-    navigate("/home");
+    navigate("/");
   };
 
   const handleUpdateUsername = async (e) => {
@@ -152,7 +152,7 @@ export default function Userdashboard() {
       toast.success("Account deleted successfully");
       localStorage.removeItem("token");
       setUser("");
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       console.error("Error deleting account:", error);
       toast.error(error.response?.data?.message || "Failed to delete account");

@@ -16,7 +16,7 @@ export default function LoginForm() {
 
 
   useEffect(()=>{
-      if(user) navigate("/home");
+      if(user) navigate("/");
   },[user]);
 
 
@@ -32,7 +32,7 @@ export default function LoginForm() {
       setUser(data.username);
       const token = data.token;
       localStorage.setItem("token", token);
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       const res = error.response;
       if (res && res.status === 401 && res.data.redirect) {
