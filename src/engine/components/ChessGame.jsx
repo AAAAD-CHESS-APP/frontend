@@ -443,39 +443,84 @@ const ChessGame = () => {
   };
 
   const renderHistoryContent = () => {
-    if (moveHistory.length === 0) return <p>No moves played yet.</p>;
+    if (moveHistory.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-32 text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-lg">No moves played yet.</p>
+        </div>
+      );
+    }
 
     switch (historyDisplayType) {
       case 'moves':
         return (
-          <div className="h-[36rem] overflow-y-auto">
-            {moveHistory.map((historyItem, index) => (
-              <div
-                key={index}
-                className="py-1 border-b border-gray-200 flex items-center"
-              >
-                <span className="font-medium mr-2">{index}.</span>
-                <span>{historyItem.moveText}</span>
-              </div>
-            ))}
+          <div className="h-64 md:h-[36rem] overflow-y-auto custom-scrollbar pr-2">
+            <div className="grid grid-cols-[auto_1fr] gap-x-3">
+              {moveHistory.map((historyItem, index) => (
+                <React.Fragment key={index}>
+                  <div className="py-2 text-right">
+                    <span className="font-mono bg-gray-700 text-gray-300 px-2 py-1 rounded-md text-xs">
+                      {index}
+                    </span>
+                  </div>
+                  <div className="py-2 border-b border-gray-700 flex items-center">
+                    {historyItem.moveText.includes('Stockfish') ? (
+                      <span className="text-red-400">{historyItem.moveText}</span>
+                    ) : (
+                      <span className="text-blue-400">{historyItem.moveText}</span>
+                    )}
+                    {index === moveHistory.length - 1 && (
+                      <span className="ml-2 px-1.5 py-0.5 bg-indigo-600 text-white text-xs rounded-sm">
+                        Latest
+                      </span>
+                    )}
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         );
+
       case 'fen':
         return (
-          <div className="h-[36rem] overflow-y-auto">
+          <div className="h-64 md:h-[36rem] overflow-y-auto custom-scrollbar pr-2">
             {moveHistory.map((historyItem, index) => (
               <div
                 key={index}
-                className="py-1 border-b border-gray-200"
+                className={`mb-4 p-3 rounded-lg ${index === moveHistory.length - 1
+                  ? 'bg-gray-700 border-l-4 border-indigo-500'
+                  : 'bg-gray-800'}`}
               >
-                <div className="font-medium">{index}. {historyItem.moveText}</div>
-                <div className="font-mono text-xs break-all bg-gray-100 p-1 mt-1">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center">
+                    <span className="font-mono bg-gray-700 text-gray-300 px-2 py-0.5 rounded-md text-xs mr-2">
+                      {index}
+                    </span>
+                    <span className={index % 2 === 0 ? "text-blue-400" : "text-red-400"}>
+                      {historyItem.moveText}
+                    </span>
+                  </div>
+                  {index === moveHistory.length - 1 && (
+                    <span className="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-sm">
+                      Latest
+                    </span>
+                  )}
+                </div>
+                <div
+                  className="font-mono text-xs break-all bg-gray-900 text-green-300 p-2 rounded border border-gray-700 overflow-x-auto whitespace-pre"
+                  onClick={() => navigator.clipboard.writeText(historyItem.fen)}
+                  title="Click to copy FEN"
+                >
                   {historyItem.fen}
                 </div>
               </div>
             ))}
           </div>
         );
+
       case 'pgn':
         const generateCumulativePgn = () => {
           // Create a chess instance to track the game
@@ -483,10 +528,6 @@ const ChessGame = () => {
 
           // Array to store the PGN at each step
           const pgnSteps = ["(Starting position - no moves yet)"];
-
-          // Track move number
-          let moveNumber = 1;
-          let isWhiteMove = true;
 
           // Process each move (skip the initial position)
           for (let i = 1; i < moveHistory.length; i++) {
@@ -525,22 +566,74 @@ const ChessGame = () => {
         };
 
         const pgnSteps = generateCumulativePgn();
+        const currentPgn = pgnSteps[pgnSteps.length - 1] || "(PGN not available)";
 
         return (
-          <div className="h-[36rem] overflow-y-auto">
-            <h4 className="font-bold mb-2">PGN:</h4>
+          <div className="h-64 md:h-[36rem] overflow-y-auto custom-scrollbar">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-bold text-indigo-300">Current Game PGN</h4>
+              <button
+                onClick={() => navigator.clipboard.writeText(currentPgn)}
+                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded text-xs flex items-center transition-colors"
+                title="Copy PGN to clipboard"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Copy
+              </button>
+            </div>
 
             {moveHistory.length > 0 && (
-              <div className="mb-3 pb-3 border-b border-gray-300">
-                <div className="font-mono text-sm bg-gray-100 p-2 mt-1">
-                  {pgnSteps[pgnSteps.length - 1] || "(PGN not available)"}
+              <div className="relative">
+                <div className="font-mono text-sm bg-gray-900 text-green-300 p-3 rounded border border-gray-700 overflow-x-auto whitespace-pre leading-relaxed">
+                  {currentPgn}
+                </div>
+                <div className="absolute top-2 right-2 bg-gray-800 px-2 py-1 rounded-full text-xs text-indigo-300">
+                  {moveHistory.length - 1} moves
                 </div>
               </div>
             )}
+
+            <div className="mt-6">
+              <h4 className="font-bold text-indigo-300 mb-3">Move Progression</h4>
+              <div className="space-y-2">
+                {pgnSteps.map((pgn, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-2 rounded text-xs ${idx === pgnSteps.length - 1
+                      ? 'bg-gray-700 border-l-4 border-indigo-500'
+                      : 'bg-gray-800 hover:bg-gray-700'}`}
+                  >
+                    <div className="flex justify-between">
+                      <span className="font-mono bg-gray-900 text-gray-400 px-1.5 rounded text-xs">
+                        {idx}
+                      </span>
+                      {idx > 0 && moveHistory[idx] && (
+                        <span className={idx % 2 === 0 ? "text-blue-400" : "text-red-400"}>
+                          {moveHistory[idx].moveText}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 font-mono text-gray-300 truncate">
+                      {pgn}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         );
+
       default:
-        return <p>Invalid display type</p>;
+        return (
+          <div className="flex items-center justify-center h-32 text-red-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p>Invalid display type</p>
+          </div>
+        );
     }
   };
 
@@ -777,13 +870,37 @@ const ChessGame = () => {
         <div className="flex flex-col items-center gap-4">
           <div className='flex w-full px-2 items-center justify-evenly gap-8'>
             <div className='flex gap-4'>
-              <div className='flex flex-col flex-1 text-white'>
-                <h2 className="text-2xl font-bold">{gameState.status}</h2>
-                <div className="text-lg">
-                  Playing as: {playerColor === 'w' ? 'White' : 'Black'}
+              <div className='flex flex-col flex-1 bg-gradient-to-r> from-gray-900 to-gray-800 p-4 rounded-lg shadow-lg border-gray-700'>
+                <div className="flex items-center mb-2">
+                  <div className={`w-3 h-3 rounded-full mr-2 ${gameState.isPlayerTurn ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'
+                    }`}></div>
+                  <h2 className="text-2xl font-semibold text-white">
+                    {gameState.status}
+                  </h2>
                 </div>
-                <div className="text-lg mb-3">
-                  Difficulty: {getCurrentDifficultyLabel()} + {difficulty}
+
+                <div className='flex gap-10'>
+                  <div className="flex items-center mt-2 mb-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${playerColor === 'w' ? 'bg-white text-gray-900' : 'bg-white text-black border border-gray-600'
+                      }`}>
+                      {playerColor === 'w' ? '♔' : '♚'}
+                    </div>
+                    <div className="text-lg text-gray-100">
+                      Playing as: <span className="font-semibold">{playerColor === 'w' ? 'White' : 'Black'}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center">
+                    <div className="p-1 rounded-full bg-white mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-black" viewBox="0 0 20 20" fill="black">
+                        <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="text-lg text-gray-100">
+                      Difficulty: <span className="font-semibold text-red-600">{getCurrentDifficultyLabel()}</span>
+                      <span className="text-sm bg-blue-500 text-white px-2 py-0.5 rounded ml-2">{difficulty}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -804,51 +921,86 @@ const ChessGame = () => {
             <div className="flex gap-4 flex-wrap mb-4">
               <button
                 onClick={toggleValidMoves}
-                className="px-4 py-2 h-10 text-white bg-blue-500 rounded hover:bg-blue-600 transition-colors"
+                className={`px-4 py-2 rounded-md transition-colors ${showValidMoves
+                  ? 'bg-blue-700 text-white hover:bg-blue-800'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  } shadow-md flex items-center justify-center`}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
                 {showValidMoves ? 'Hide Valid Moves' : 'Show Valid Moves'}
               </button>
               <button
                 onClick={resetGame}
-                className="px-4 py-2 h-10 text-white bg-green-500 rounded hover:bg-green-600 transition-colors"
+                className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors shadow-md flex items-center justify-center"
               >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
                 New Game
               </button>
               <button
                 onClick={undoLastMove}
-                // Disable the button if there are no moves to undo
                 disabled={moveHistory.length <= 1}
-                className={`px-4 py-2 h-10 text-white rounded transition-colors ${moveHistory.length <= 1
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-yellow-500 hover:bg-yellow-600'
+                className={`px-4 py-2 rounded-md transition-colors shadow-md flex items-center justify-center ${moveHistory.length <= 1
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  : 'bg-amber-500 text-white hover:bg-amber-600'
                   }`}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
                 Undo Move
               </button>
               <button
                 onClick={toggleAnalysis}
-                className="px-4 py-2 h-10 text-white bg-orange-500 rounded hover:bg-orange-600 transition-colors"
+                className={`px-4 py-2 rounded-md transition-colors shadow-md flex items-center justify-center ${showAnalysis
+                  ? 'bg-orange-700 text-white hover:bg-orange-800'
+                  : 'bg-orange-600 text-white hover:bg-orange-700'
+                  }`}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
                 {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
               </button>
 
               <button
                 onClick={toggleMoveHistory}
-                className="px-4 py-2 h-10 text-white bg-purple-500 rounded hover:bg-purple-600 transition-colors"
+                className={`px-4 py-2 rounded-md transition-colors shadow-md flex items-center justify-center ${showMoveHistory
+                  ? 'bg-purple-700 text-white hover:bg-purple-800'
+                  : 'bg-purple-600 text-white hover:bg-purple-700'
+                  }`}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
                 {showMoveHistory ? 'Hide Move History' : 'Show Move History'}
               </button>
 
               <button
                 onClick={toggleHints}
-                className='px-4 py-2 h-10 text-white bg-purple-500 rounded hover:bg-purple-600 transition-colors'
+                className={`px-4 py-2 rounded-md transition-colors shadow-md flex items-center justify-center ${showHints
+                  ? 'bg-indigo-700 text-white hover:bg-indigo-800'
+                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
               >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
                 {showHints ? 'Hide Hints' : 'Show Hints'}
               </button>
             </div>
           </div>
-          <div className='flex w-[100vw] flex-wrap px-4'>
-            <div className='flex-1 flex flex-col'>
+          <div
+            className={`w-full px-4 gap-40 flex flex-wrap
+              ${showAnalysis || showHints || showMoveHistory
+                ? 'justify-start lg:flex-nowrap'
+                : 'justify-center'}`}
+          >
+
+            <div className='lg:w-1/3'>
               <CustomChessboard
                 fen={game.fen()}
                 selectedSquare={selectedSquare}
@@ -866,84 +1018,107 @@ const ChessGame = () => {
                 }}
               />
             </div>
-            {showAnalysis && (<div className='flex-1 text-center'>
-              <div className="mt-6 w-full flex gap-4">
-                <GameAnalysis
-                  moveHistory={moveHistory}
-                  game={game}
-                  difficulty={difficulty}
-                  playerColor={playerColor}
-                />
-              </div>
-            </div>
-            )}
-
-            {
-              showHints &&
-              <div className='flex flex-1 flex-col'>
-
-                {gameStarted && (
-                  <div className="mt-4 w-full max-w-md">
-                    <HintPanel
-                      ref={hintPanelRef}
-                      game={game}
-                      difficulty={difficulty}
-                      isPlayerTurn={gameState.isPlayerTurn}
-                      onHintReceived={handleHintReceived}
-                      hints={selectedHintLimit}
-                    />
-                  </div>
-                )}
-
-                {activeHint && (
-                  <div className="w-full max-w-md mt-4 text-gray-900">
-                    <ActiveHint hintData={activeHint} />
-                  </div>
-                )}
-
-              </div>
-            }
-            {showMoveHistory && (
-              <div className="flex flex-1 flex-col text-gray-900 items-center w-full mb-4">
-                <div className="w-full h-full bg-white rounded-lg shadow-md p-4">
-                  <div className="flex justify-between mb-3">
-                    <h3 className="font-bold text-lg">Move History</h3>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => changeHistoryDisplayType('moves')}
-                        className={`px-2 py-1 text-xs rounded ${historyDisplayType === 'moves'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 hover:bg-gray-300'}`}
-                      >
-                        Moves
-                      </button>
-                      <button
-                        onClick={() => changeHistoryDisplayType('fen')}
-                        className={`px-2 py-1 text-xs rounded ${historyDisplayType === 'fen'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 hover:bg-gray-300'}`}
-                      >
-                        FEN
-                      </button>
-                      <button
-                        onClick={() => changeHistoryDisplayType('pgn')}
-                        className={`px-2 py-1 text-xs rounded ${historyDisplayType === 'pgn'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 hover:bg-gray-300'}`}
-                      >
-                        PGN
-                      </button>
-                    </div>
-                  </div>
-
-                  {renderHistoryContent()}
-
-                  <div className="mt-3 text-xs text-gray-500">
-                    Total moves: {moveHistory.length - 1}
-                  </div>
+            <div className='lg:w-2/3 flex flex-col gap-6'>
+              {showAnalysis && (<div className='text-center'>
+                <div className="mt-6 flex gap-4">
+                  <GameAnalysis
+                    moveHistory={moveHistory}
+                    game={game}
+                    difficulty={difficulty}
+                    playerColor={playerColor}
+                  />
                 </div>
               </div>
-            )}
+              )}
+
+              {
+                showHints &&
+                <div className='flex flex-col'>
+
+                  {gameStarted && (
+                    <div className="mt-4 w-full max-w-md">
+                      <HintPanel
+                        ref={hintPanelRef}
+                        game={game}
+                        difficulty={difficulty}
+                        isPlayerTurn={gameState.isPlayerTurn}
+                        onHintReceived={handleHintReceived}
+                        hints={selectedHintLimit}
+                      />
+                    </div>
+                  )}
+
+                  {activeHint && (
+                    <div className="w-full max-w-md mt-4 text-gray-900">
+                      <ActiveHint hintData={activeHint} />
+                    </div>
+                  )}
+
+                </div>
+              }
+              {showMoveHistory && (
+                <div className="flexflex-col items-center w-full mb-6">
+                  <div className="w-full h-full bg-gray-800 text-white rounded-lg shadow-lg p-4 border border-gray-700">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="font-bold text-lg flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Move History
+                      </h3>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => changeHistoryDisplayType('moves')}
+                          className={`px-2 py-1 text-xs rounded transition-colors ${historyDisplayType === 'moves'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                            }`}
+                        >
+                          Moves
+                        </button>
+                        <button
+                          onClick={() => changeHistoryDisplayType('fen')}
+                          className={`px-2 py-1 text-xs rounded transition-colors ${historyDisplayType === 'fen'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                            }`}
+                        >
+                          FEN
+                        </button>
+                        <button
+                          onClick={() => changeHistoryDisplayType('pgn')}
+                          className={`px-2 py-1 text-xs rounded transition-colors ${historyDisplayType === 'pgn'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                            }`}
+                        >
+                          PGN
+                        </button>
+                      </div>
+                    </div>
+
+                    {renderHistoryContent()}
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="text-xs text-gray-400">
+                        Total moves: <span className="font-semibold text-purple-400">{moveHistory.length - 1}</span>
+                      </div>
+                      {moveHistory.length > 1 && (
+                        <button
+                          onClick={undoLastMove}
+                          className="text-xs px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 flex items-center transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                          </svg>
+                          Undo Last Move
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

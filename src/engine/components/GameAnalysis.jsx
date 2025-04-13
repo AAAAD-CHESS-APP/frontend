@@ -259,43 +259,67 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
 
         if (analysisType === 'overview') {
             return (
-                <div className="mt-4">
-                    <h3 className="text-xl font-bold mb-3 text-white">Game Analysis</h3>
+                <div className="mt-[-4rem]">
+                    <h3 className="text-lg font-bold mb-3 text-white flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Game Analysis
+                    </h3>
 
                     {analysisResults.overallEvaluation && (
-                        <div className="mb-4 p-3 bg-gray-100 rounded text-left">
-                            <div className="text-lg font-semibold">Overall Evaluation</div>
+                        <div className="mb-4 p-4 bg-gray-800 rounded-lg border border-gray-700 shadow-lg text-white">
+                            <div className="text-md font-semibold text-blue-300">Overall Evaluation</div>
                             <div className="flex flex-col mt-2">
-                                <div>Average Score: 
-                                    <span className='text-blue-600'>
-                                        { analysisResults.overallEvaluation.averageScore}
+                                <div className="flex justify-between items-center py-1">
+                                    <span>Average Score:</span>
+                                    <span className={`font-mono font-medium ${
+                                        parseFloat(analysisResults.overallEvaluation.averageScore) > 0.5 ? 'text-green-400' :
+                                        parseFloat(analysisResults.overallEvaluation.averageScore) < -0.5 ? 'text-red-400' :
+                                        'text-blue-300'
+                                    }`}>
+                                        {analysisResults.overallEvaluation.averageScore}
                                     </span>
                                 </div>
-                                <div>Range: [{analysisResults.overallEvaluation.minScore}, {analysisResults.overallEvaluation.maxScore}]</div>
-                                <div className="mt-1 text-sm">{analysisResults.overallEvaluation.advantage}</div>
+                                <div className="flex justify-between items-center py-1">
+                                    <span>Score Range:</span>
+                                    <span className="font-mono">
+                                        [{analysisResults.overallEvaluation.minScore}, {analysisResults.overallEvaluation.maxScore}]
+                                    </span>
+                                </div>
+                                <div className="mt-2 text-sm bg-gray-700 p-2 rounded">
+                                    {analysisResults.overallEvaluation.advantage}
+                                </div>
                             </div>
                         </div>
                     )}
 
                     <div className="mt-4">
-                        <h4 className="text-lg text-white mb-2">Position Timeline</h4>
-                        <div className="h-40 overflow-y-auto border border-gray-200 rounded">
+                        <h4 className="text-md text-white mb-2 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            Position Timeline
+                        </h4>
+                        <div className="h-48 overflow-y-auto bg-gray-800 rounded-lg shadow-lg">
                             {analysisResults.positions.map((position, index) => (
                                 <div
                                     key={index}
-                                    className={`p-2 cursor-pointer hover:bg-blue-50 hover:text-gray-900 border-b border-gray-200 ${selectedPosition === index ? 'bg-blue-100' : 'text-white'
-                                        }`}
+                                    className={`p-3 cursor-pointer transition-all hover:bg-gray-700 border-b border-gray-700 ${
+                                        selectedPosition === index ? 'bg-blue-900 border-l-4 border-l-blue-500 ' : ''
+                                    }`}
                                     onClick={() => handlePositionSelect(index)}
                                 >
-                                    <div className="flex justify-between">
-                                        <div>
+                                    <div className="flex justify-between items-center">
+                                        <div className="text-white">
                                             <span className="font-medium mr-2">{position.moveNumber}.</span>
                                             <span>{position.moveText}</span>
                                         </div>
-                                        <div className={`font-medium ${position.score > 0.5 ? 'text-green-600' :
-                                                position.score < -0.5 ? 'text-red-600' :
-                                                    'text-gray-600'
-                                            }`}>
+                                        <div className={`font-mono font-medium ${
+                                            position.score > 0.5 ? 'text-green-400' :
+                                            position.score < -0.5 ? 'text-red-400' :
+                                            'text-blue-300'
+                                        }`}>
                                             {position.score ? position.score.toFixed(2) : 'N/A'}
                                         </div>
                                     </div>
@@ -306,22 +330,28 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
 
                     {analysisResults.positions && analysisResults.positions[selectedPosition] && (
                         <div className="mt-4">
-                            <h4 className="text-lg text-white mb-2">Selected Position Analysis</h4>
-                            <div className="p-3 bg-gray-100 rounded text-left">
-                                <div>
-                                    <span className="font-medium">Position Score:</span>
-                                    <span className={`ml-2 ${analysisResults.positions[selectedPosition].score > 0.5 ? 'text-green-600 font-medium' :
-                                            analysisResults.positions[selectedPosition].score < -0.5 ? 'text-red-600 font-medium' :
-                                                'text-gray-600'
-                                        }`}>
+                            <h4 className="text-md text-white mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Selected Position Analysis
+                            </h4>
+                            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700 shadow-lg">
+                                <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                    <span className="font-medium text-white">Position Score:</span>
+                                    <span className={`font-mono font-medium ${
+                                        analysisResults.positions[selectedPosition].score > 0.5 ? 'text-green-400' :
+                                        analysisResults.positions[selectedPosition].score < -0.5 ? 'text-red-400' :
+                                        'text-blue-300'
+                                    }`}>
                                         {analysisResults.positions[selectedPosition].score ?
                                             analysisResults.positions[selectedPosition].score.toFixed(2) : 'N/A'}
                                     </span>
                                 </div>
 
-                                <div className="mt-2">
-                                    <span className="font-medium">Best Move:</span>
-                                    <span className="ml-2 text-green-600 font-medium">
+                                <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                    <span className="font-medium text-white">Best Move:</span>
+                                    <span className="font-mono font-medium text-green-400">
                                         {analysisResults.positions[selectedPosition].bestMove !== 'no move' ?
                                             analysisResults.positions[selectedPosition].bestMove : 'N/A'}
                                     </span>
@@ -329,16 +359,24 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
 
                                 {analysisResults.positions[selectedPosition].lines &&
                                     analysisResults.positions[selectedPosition].lines.length > 0 && (
-                                        <div className="mt-2">
-                                            <div className="font-medium">Top Variations:</div>
-                                            <div className="mt-1 text-sm">
+                                        <div className="mt-3">
+                                            <div className="font-medium text-white mb-2">Top Variations:</div>
+                                            <div className="space-y-2">
                                                 {analysisResults.positions[selectedPosition].lines
                                                     .filter(line => line.pv)
                                                     .slice(0, 3)
                                                     .map((line, idx) => (
-                                                        <div key={idx} className="mb-1">
+                                                        <div key={idx} className="p-2 bg-gray-700 rounded text-gray-100 font-mono text-sm">
                                                             {line.pv.slice(0, 5).join(' ')}
-                                                            {line.score && ` (${line.score.toFixed(2)})`}
+                                                            {line.score && (
+                                                                <span className={`ml-2 ${
+                                                                    line.score > 0 ? 'text-green-400' :
+                                                                    line.score < 0 ? 'text-red-400' :
+                                                                    'text-gray-300'
+                                                                }`}>
+                                                                    ({line.score.toFixed(2)})
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     ))
                                                 }
@@ -353,23 +391,29 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
         } else if (analysisType === 'position') {
             return (
                 <div className="mt-4">
-                    <h3 className="text-xl text-white mb-3">Current Position Analysis</h3>
+                    <h3 className="text-lg font-bold mb-3 text-white flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        Current Position Analysis
+                    </h3>
 
                     {analysisResults.positions && analysisResults.positions[0] && (
-                        <div className="p-3 bg-gray-100 text-left rounded">
-                            <div>
-                                <span className="font-medium">Position Score:</span>
-                                <span className={`ml-2 ${analysisResults.positions[0].score > 0.5 ? 'text-green-600 font-medium' :
-                                        analysisResults.positions[0].score < -0.5 ? 'text-red-600 font-medium' :
-                                            'text-gray-600'
-                                    }`}>
+                        <div className="p-4 bg-gray-800 rounded-lg shadow-lg">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                <span className="font-medium text-white">Position Score:</span>
+                                <span className={`font-mono font-medium ${
+                                    analysisResults.positions[0].score > 0.5 ? 'text-green-400' :
+                                    analysisResults.positions[0].score < -0.5 ? 'text-red-400' :
+                                    'text-blue-300'
+                                }`}>
                                     {analysisResults.positions[0].score ? analysisResults.positions[0].score.toFixed(2) : 'N/A'}
                                 </span>
                             </div>
 
-                            <div className="mt-2">
-                                <span className="font-medium">Best Move:</span>
-                                <span className="ml-2 text-green-600 font-medium">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                <span className="font-medium text-white">Best Move:</span>
+                                <span className="font-mono font-medium text-green-400">
                                     {analysisResults.positions[0].bestMove !== 'no move' ?
                                         analysisResults.positions[0].bestMove : 'N/A'}
                                 </span>
@@ -377,26 +421,27 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
 
                             {analysisResults.positions[0].lines && analysisResults.positions[0].lines.length > 0 && (
                                 <div className="mt-4">
-                                    <div className="font-medium">Top Variations:</div>
-                                    <div className="mt-2">
+                                    <div className="font-medium text-white mb-2">Top Variations:</div>
+                                    <div className="space-y-3">
                                         {analysisResults.positions[0].lines
                                             .filter(line => line.pv)
                                             .slice(0, 3)
                                             .map((line, idx) => (
-                                                <div key={idx} className="mb-2 p-2 bg-gray-50 rounded">
-                                                    <div className="font-medium text-blue-700">Variation {idx + 1}:</div>
-                                                    <div className="mt-1">
+                                                <div key={idx} className="p-3 bg-gray-700 rounded">
+                                                    <div className="font-medium text-blue-300 mb-1">Variation {idx + 1}:</div>
+                                                    <div className="font-mono text-gray-100">
                                                         {line.pv && line.pv.slice(0, 8).join(' ')}
                                                         {line.score !== undefined &&
-                                                            <span className={`ml-2 font-medium ${line.score > 0 ? 'text-green-600' :
-                                                                    line.score < 0 ? 'text-red-600' :
-                                                                        'text-gray-600'
-                                                                }`}>
+                                                            <span className={`ml-2 font-medium ${
+                                                                line.score > 0 ? 'text-green-400' :
+                                                                line.score < 0 ? 'text-red-400' :
+                                                                'text-gray-300'
+                                                            }`}>
                                                                 ({typeof line.score === 'number' ? line.score.toFixed(2) : line.score})
                                                             </span>
                                                         }
                                                         {line.mate !== undefined &&
-                                                            <span className="ml-2 font-bold text-purple-600">
+                                                            <span className="ml-2 font-bold text-purple-400">
                                                                 (Mate in {Math.abs(line.mate)})
                                                             </span>
                                                         }
@@ -419,16 +464,16 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
     const renderTacticalOpportunities = () => {
         if (analysisInProgress) {
             return (
-                <div className="flex justify-center items-center h-32">
-                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-                    <span className="ml-3 text-lg">Analyzing tactics...</span>
+                <div className="flex justify-center items-center h-40 bg-gray-800 bg-opacity-50 rounded-lg">
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-400"></div>
+                    <span className="ml-3 text-lg text-purple-300">Analyzing tactics...</span>
                 </div>
             );
         }
 
         if (!tacticalOpportunities || tacticalOpportunities.length === 0) {
             return (
-                <div className="mt-4 p-3 bg-gray-100 rounded text-center">
+                <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700 text-center text-gray-300">
                     No significant tactical opportunities found in this game.
                 </div>
             );
@@ -436,65 +481,81 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
 
         return (
             <div className="mt-4">
-                <h3 className="text-xl text-white mb-3">Tactical Opportunities</h3>
-                <div className="h-64 overflow-y-auto border border-gray-200 rounded">
+                <h3 className="text-xl font-bold mb-3 text-white flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Tactical Opportunities
+                </h3>
+                <div className="h-64 overflow-y-auto bg-gray-800 rounded-lg shadow-lg">
                     {tacticalOpportunities.map((opportunity, index) => (
                         <div
                             key={index}
-                            className={`p-3 cursor-pointer hover:bg-blue-50 hover:text-gray-900 border-b border-gray-200 ${displayFen === opportunity.fen ? 'bg-blue-100' : ' text-white '
-                                }`}
+                            className={`p-3 cursor-pointer transition-all hover:bg-gray-700 border-b border-gray-700 ${
+                                displayFen === opportunity.fen ? 'bg-purple-900 border-l-4 border-l-purple-500' : ''
+                            }`}
                             onClick={() => handleTacticsSelect(opportunity)}
                         >
                             <div className="flex justify-between items-center">
-                                <div>
+                                <div className="text-white">
                                     <span className="font-medium">Move {opportunity.moveNumber}: </span>
-                                    <span className={`font-medium ${opportunity.classification === 'Blunder' ? 'text-red-600' :
-                                            opportunity.classification === 'Mistake' ? 'text-orange-600' :
-                                                opportunity.classification === 'Inaccuracy' ? 'text-yellow-600' :
-                                                    'text-gray-600'
-                                        }`}>
+                                    <span className={`font-medium ${
+                                        opportunity.classification === 'Blunder' ? 'text-red-400' :
+                                        opportunity.classification === 'Mistake' ? 'text-orange-400' :
+                                        opportunity.classification === 'Inaccuracy' ? 'text-yellow-400' :
+                                        'text-gray-400'
+                                    }`}>
                                         {opportunity.classification}
                                     </span>
                                 </div>
-                                <div className="text-red-600 font-medium">
+                                <div className="text-red-400 font-mono font-medium">
                                     {opportunity.scoreDifference > 0 ? '+' : ''}
                                     {opportunity.scoreDifference.toFixed(2)}
                                 </div>
                             </div>
-                            <div className="mt-1 text-sm">
+                            <div className="mt-1 text-sm text-gray-300">
                                 <span>Played: </span>
                                 <span className="font-mono">{opportunity.actualMove}</span>
                                 <span className="mx-2">|</span>
                                 <span>Best: </span>
-                                <span className="font-mono text-green-600">{opportunity.bestMove}</span>
+                                <span className="font-mono text-green-400">{opportunity.bestMove}</span>
                             </div>
                         </div>
                     ))}
                 </div>
 
                 {displayFen && (
-                    <div className="mt-4 p-3 text-left bg-gray-100 rounded">
-                        <div className="font-medium mb-2">Position Details:</div>
+                    <div className="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg">
+                        <div className="font-medium text-white mb-3">Position Details:</div>
                         {tacticalOpportunities.find(o => o.fen === displayFen) && (
-                            <div>
-                                <div>
-                                    <span className="font-medium">Played Move: </span>
-                                    <span className="font-mono">{tacticalOpportunities.find(o => o.fen === displayFen).actualMove}</span>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                    <span className="text-gray-300">Played Move: </span>
+                                    <span className="font-mono text-white">{tacticalOpportunities.find(o => o.fen === displayFen).actualMove}</span>
                                 </div>
-                                <div className="mt-1">
-                                    <span className="font-medium">Best Move: </span>
-                                    <span className="font-mono text-green-600">{tacticalOpportunities.find(o => o.fen === displayFen).bestMove}</span>
+                                <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                    <span className="text-gray-300">Best Move: </span>
+                                    <span className="font-mono text-green-400">{tacticalOpportunities.find(o => o.fen === displayFen).bestMove}</span>
                                 </div>
-                                <div className="mt-1">
-                                    <span className="font-medium">Evaluation Difference: </span>
-                                    <span className="text-red-600 font-medium">
+                                <div className="flex justify-between items-center py-2 border-b border-gray-700">
+                                    <span className="text-gray-300">Evaluation Difference: </span>
+                                    <span className="text-red-400 font-mono font-medium">
                                         {tacticalOpportunities.find(o => o.fen === displayFen).scoreDifference.toFixed(2)}
                                     </span>
                                 </div>
                             </div>
                         )}
-                        <div className="mt-2 text-sm text-center text-gray-600">
-                            Green arrow shows the best move. Red arrow shows the played move.
+                        <div className="mt-3 text-sm text-center text-gray-400 bg-gray-700 p-2 rounded">
+                            <div className="flex justify-center items-center space-x-4">
+                                <div className="flex items-center">
+                                    <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                                    <span>Best move</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
+                                    <span>Played move</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -510,29 +571,43 @@ const GameAnalysis = ({ moveHistory, game, difficulty, playerColor }) => {
                         <button
                             onClick={analyzeCurrentPosition}
                             disabled={analysisInProgress}
-                            className={`px-4 py-2 rounded transition-colors ${analysisInProgress ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
-                                }`}
-                        >
+                            className={`px-4 py-2 rounded-lg transition-all flex items-center ${
+                                analysisInProgress 
+                                    ? 'bg-gray-600 text-gray-300 cursor-not-allowed' 
+                                    : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
+                            } shadow-md`}
+                        >   
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
                             Analyze Current Position
                         </button>
                         <button
                             onClick={startAnalysis}
                             disabled={analysisInProgress || !moveHistory || moveHistory.length <= 1}
-                            className={`px-4 py-2 rounded transition-colors ${analysisInProgress || !moveHistory || moveHistory.length <= 1
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-green-500 text-white hover:bg-green-600'
-                                }`}
+                            className={`px-4 py-2 rounded-lg transition-all flex items-center ${
+                                analysisInProgress || !moveHistory || moveHistory.length <= 1
+                                    ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800'
+                            } shadow-md`}
                         >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
                             Analyze Full Game
                         </button>
                         <button
                             onClick={startTacticalAnalysis}
                             disabled={analysisInProgress || !moveHistory || moveHistory.length <= 2}
-                            className={`px-4 py-2 rounded transition-colors ${analysisInProgress || !moveHistory || moveHistory.length <= 2
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-purple-500 text-white hover:bg-purple-600'
-                                }`}
+                            className={`px-4 py-2 rounded-lg transition-all flex items-center ${
+                                analysisInProgress || !moveHistory || moveHistory.length <= 2
+                                    ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800'
+                            } shadow-md`}
                         >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
                             Find Tactical Opportunities
                         </button>
                     </div>

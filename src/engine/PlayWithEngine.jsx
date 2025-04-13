@@ -22,8 +22,9 @@ const PlayWithEngine = () => {
             </div>
 
             {/* Main content */}
-            <Navbar />
-            <br />
+            {/* <div className="mb-40">
+                <Navbar />
+            </div> */}
             <Toaster />
             <ChessGame playerData={playerData} />
         </div>
