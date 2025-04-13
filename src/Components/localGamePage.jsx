@@ -9,8 +9,8 @@ function LocalGamePage() {
     const [player2, setPlayer2] = useState("");
     const [timeControl, setTimeControl] = useState("infinity");
     const [hasPreviousGame, setHasPreviousGame] = useState(false);
-    const [previousGameId, setPreviousGameId] = useState(null);
     const navigate = useNavigate();
+    
     const timeOptions = [
         { value: "1", label: "1 Minute" },
         { value: "5", label: "5 Minutes" },
@@ -19,61 +19,94 @@ function LocalGamePage() {
         { value: "infinity", label: "∞" },
     ];
 
-    // Add useEffect to check for previous game
+    // Check for previous game on component mount
     useEffect(() => {
-        const storedGameId = sessionStorage.getItem("local-gameId");
-        const storedGame = sessionStorage.getItem("localgame");
-        if (storedGameId && storedGame) {
+        const storedGameId = localStorage.getItem("local-gameId");
+        const storedGame = localStorage.getItem("localgame");
+        const player1 = localStorage.getItem("player1");
+        const player2 = localStorage.getItem("player2");
+        
+        // Only show continue option if we have all required data
+        if (storedGameId && storedGame && player1 && player2) {
             setHasPreviousGame(true);
-            setPreviousGameId(storedGameId);
         }
     }, []);
 
-    // Add function to continue previous game
+    // Continue a previous game
     function continuePreviousGame() {
-        const player1 = sessionStorage.getItem("player1");
-        const player2 = sessionStorage.getItem("player2");
-        navigate(`/localgame/${previousGameId}`, {
-            state: {
-                player1,
-                player2,
-                timeLimit: sessionStorage.getItem("timeControl")
-            }
-        });
-    }
-
-    function startLocalGame() {
-        if (player1.trim() == '' || player2.trim() == '') {
-            toast.error("Enter Player Names");
+        const gameId = localStorage.getItem("local-gameId");
+        const player1 = localStorage.getItem("player1");
+        const player2 = localStorage.getItem("player2");
+        const timeControl = localStorage.getItem("timeControl") || "infinity";
+        
+        if (!gameId || !player1 || !player2) {
+            toast.error("Previous game data is incomplete");
+            clearGameData();
             return;
         }
-        // Clear all previous game data
-        sessionStorage.removeItem("localgame");
-        sessionStorage.removeItem("local-gameId");
-        sessionStorage.removeItem("player1");
-        sessionStorage.removeItem("player2");
-        sessionStorage.removeItem("whiteTime");
-        sessionStorage.removeItem("blackTime");
-
-        // Set new game data
-        sessionStorage.setItem("timeControl", timeControl);
-        sessionStorage.setItem("player1", player1);
-        sessionStorage.setItem("player2", player2);
-
-        const gameId = uuidv4();
-        sessionStorage.setItem("local-gameId", gameId);
-
+        
         navigate(`/localgame/${gameId}`, {
             state: {
                 player1,
                 player2,
-                timeLimit: timeControl
+                timeControl
+            }
+        });
+    }
+
+    // Clear all game related data from localStorage
+    function clearGameData() {
+        localStorage.removeItem("localgame");
+        localStorage.removeItem("local-gameId");
+        localStorage.removeItem("local-fens");
+        localStorage.removeItem("local-pgns");
+        localStorage.removeItem("localplayer");
+        localStorage.removeItem("player1");
+        localStorage.removeItem("player2");
+        localStorage.removeItem("whiteTime");
+        localStorage.removeItem("blackTime");
+        localStorage.removeItem("timeControl");
+        setHasPreviousGame(false);
+    }
+
+    // Start a new local game
+    function startLocalGame() {
+        if (player1.trim() === '' || player2.trim() === '') {
+            toast.error("Please enter names for both players");
+            return;
+        }
+        
+        // Clear previous game data and set new values
+        clearGameData();
+        
+        // Generate new game ID and store game settings
+        const gameId = uuidv4();
+        localStorage.setItem("local-gameId", gameId);
+        localStorage.setItem("timeControl", timeControl);
+        localStorage.setItem("player1", player1);
+        localStorage.setItem("player2", player2);
+        
+        // Set initial times if using time control
+        if (timeControl !== "infinity") {
+            const initialSeconds = parseInt(timeControl) * 60;
+            localStorage.setItem("whiteTime", initialSeconds.toString());
+            localStorage.setItem("blackTime", initialSeconds.toString());
+        }
+        
+        navigate(`/localgame/${gameId}`, {
+            state: {
+                player1,
+                player2,
+                timeControl
             }
         });
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div 
+            className="min-h-screen flex items-center justify-center bg-gray-50 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: 'url("/bg2.jpg")' }}
+        >
             <div className="flex flex-col items-center gap-6 p-8 bg-white border border-gray-200 rounded-lg shadow-sm max-w-lg w-full mx-4">
                 <h2 className="text-2xl font-bold text-gray-900">Local Chess Game</h2>
                 
@@ -97,6 +130,7 @@ function LocalGamePage() {
                             </div>
                             <input
                                 placeholder="Enter White Player name"
+                                value={player1}
                                 onChange={(e) => setPlayer1(e.target.value)}
                                 className="pl-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                             />
@@ -108,6 +142,7 @@ function LocalGamePage() {
                             </div>
                             <input
                                 placeholder="Enter Black Player name"
+                                value={player2}
                                 onChange={(e) => setPlayer2(e.target.value)}
                                 className="pl-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                             />
