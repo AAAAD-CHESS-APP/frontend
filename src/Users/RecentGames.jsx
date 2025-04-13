@@ -5,6 +5,8 @@ import { MdGames, MdLeaderboard } from 'react-icons/md';
 import { userAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { FiX } from 'react-icons/fi';
+import GameViewer from './GameViewer';
 
 export default function RecentGames() {
   const { playerId } = useParams();
@@ -14,7 +16,34 @@ export default function RecentGames() {
   const [filter, setFilter] = useState('all');
   const [playerName, setPlayerName] = useState('');
   const [error, setError] = useState(null);
-  
+  const [showModal, setShowModal] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [showGameViewer, setShowGameViewer] = useState(false);
+
+  // Add this function to handle opening the modal
+  const handleViewGame = (game) => {
+    setSelectedGame(game);
+    setShowModal(true);
+  };
+
+
+
+  // Add this function to close the modal
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedGame(null);
+  };
+
+  const openGameViewer = () => {
+    setShowGameViewer(true);
+    setShowModal(false); // Close the info modal
+  };
+
+  // Add this function to close the game viewer
+  const closeGameViewer = () => {
+    setShowGameViewer(false);
+  };
+
   useEffect(() => {
     async function fetchGames() {
       try {
@@ -22,13 +51,52 @@ export default function RecentGames() {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:8080/api/userGames', {
           headers: {
-          Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         });
+
         console.log(response.data);
 
+        if (response.data && response.data.games) {
+          // Format the games data to match UI expectations
+          const formattedGames = response.data.games.map(game => {
+            const isPlayerBlack = game.black === response.data.playerId;
+            const playerColor = isPlayerBlack ? 'Black' : 'White';
+            const opponent = isPlayerBlack ? game.whiteName : game.blackName;
+
+            // Determine result
+            let result = 'Draw';
+            if (game.result.includes('white') && !isPlayerBlack) {
+              result = 'Win';
+            } else if (game.result.includes('black') && isPlayerBlack) {
+              result = 'Win';
+            } else {
+              result = 'Loss';
+            }
+
+            return {
+              id: game._id || `game-${Math.random().toString(36).substr(2, 9)}`,
+              date: new Date(game.startTime),
+              opponent,
+              playerColor,
+              result,
+              moves: game.moves || [],
+              gameType: 'Standard',
+              pgn: game.fen || [] // We're using FEN instead of PGN
+            };
+          });
+
+          setGames(formattedGames);
+
+          // If we have player info, set the player name
+          if (response.data.playerId) {
+            const playerData = await userAPI.getUserById(response.data.playerId, token);
+            if (playerData && playerData.data) {
+              setPlayerName(playerData.data.name || 'Player');
+            }
+          }
         }
-         catch (err) {
+      } catch (err) {
         console.error('Error fetching game history:', err);
         setError('Error loading games. Please try again later.');
         toast.error('Failed to load game history');
@@ -36,10 +104,10 @@ export default function RecentGames() {
         setIsLoading(false);
       }
     }
-    
+
     fetchGames();
   }, [playerId]);
-  
+
   // Filter games based on selected filter
   const filteredGames = games.filter(game => {
     if (filter === 'all') return true;
@@ -48,7 +116,7 @@ export default function RecentGames() {
     if (filter === 'draws') return game.result === 'Draw';
     return true;
   });
-  
+
   // Helper function to format date
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -59,7 +127,7 @@ export default function RecentGames() {
       minute: '2-digit'
     });
   };
-  
+
   // Helper function to get style class based on result
   const getResultClass = (result) => {
     switch (result) {
@@ -135,41 +203,37 @@ export default function RecentGames() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-4 py-1.5 rounded-md transition-colors ${
-                  filter === 'all' 
-                  ? 'bg-black text-white' 
+                className={`px-4 py-1.5 rounded-md transition-colors ${filter === 'all'
+                  ? 'bg-black text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 All Games
               </button>
               <button
                 onClick={() => setFilter('wins')}
-                className={`px-4 py-1.5 rounded-md transition-colors ${
-                  filter === 'wins' 
-                  ? 'bg-green-600 text-white' 
+                className={`px-4 py-1.5 rounded-md transition-colors ${filter === 'wins'
+                  ? 'bg-green-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 Wins
               </button>
               <button
                 onClick={() => setFilter('losses')}
-                className={`px-4 py-1.5 rounded-md transition-colors ${
-                  filter === 'losses' 
-                  ? 'bg-red-600 text-white' 
+                className={`px-4 py-1.5 rounded-md transition-colors ${filter === 'losses'
+                  ? 'bg-red-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 Losses
               </button>
               <button
                 onClick={() => setFilter('draws')}
-                className={`px-4 py-1.5 rounded-md transition-colors ${
-                  filter === 'draws' 
-                  ? 'bg-gray-600 text-white' 
+                className={`px-4 py-1.5 rounded-md transition-colors ${filter === 'draws'
+                  ? 'bg-gray-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 Draws
               </button>
@@ -232,7 +296,7 @@ export default function RecentGames() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span 
+                        <span
                           className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getResultClass(game.result)}`}
                         >
                           {game.result}
@@ -247,12 +311,124 @@ export default function RecentGames() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          onClick={() => navigate(`/game/replay/${game.id}`)}
+                          onClick={() => handleViewGame(game)}
                           className="text-black font-medium hover:text-gray-700"
                         >
                           View Game
                         </button>
                       </td>
+
+                      {showModal && selectedGame && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
+                            <div className="flex justify-between items-center border-b border-gray-200 px-6 py-4">
+                              <h3 className="text-xl font-bold text-gray-900">
+                                Game Details
+                              </h3>
+                              <button
+                                onClick={closeModal}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                              >
+                                <FiX size={24} />
+                              </button>
+                            </div>
+
+                            <div className="p-6 overflow-y-auto" style={{ maxHeight: "calc(90vh - 80px)" }}>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                  <p className="text-sm text-gray-500">Date</p>
+                                  <p className="font-medium">{formatDate(selectedGame.date)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Against</p>
+                                  <p className="font-medium">{selectedGame.opponent}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Result</p>
+                                  <p className={`font-medium inline-block px-2 py-1 rounded ${selectedGame.result === 'Win' ? 'bg-green-100 text-green-800' :
+                                    selectedGame.result === 'Loss' ? 'bg-red-100 text-red-800' :
+                                      'bg-gray-100 text-gray-800'
+                                    }`}>
+                                    {selectedGame.result}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Playing as</p>
+                                  <p className="font-medium">{selectedGame.playerColor}</p>
+                                </div>
+                              </div>
+
+                              <div className="mb-6">
+                                <h4 className="font-bold text-gray-900 mb-3">Move History</h4>
+                                {selectedGame.moves && selectedGame.moves.length > 0 ? (
+                                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                    <div className="grid grid-cols-2 gap-2">
+                                      {selectedGame.moves.map((moveData, idx) => (
+                                        <div key={idx} className="flex items-center p-2 border-b border-gray-100">
+                                          <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 ${moveData.color === 'white' ? 'bg-gray-100' : 'bg-gray-700 text-white'
+                                            }`}>
+                                            {idx + 1}
+                                          </div>
+                                          <span className="font-mono">
+                                            {moveData.color === 'white' ? 'White: ' : 'Black: '}
+                                            {moveData.move?.join(' ') || '-'}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-gray-500">No move data available</p>
+                                )}
+                              </div>
+
+                              {selectedGame.pgn && selectedGame.pgn.length > 0 && (
+                                <div>
+                                  <h4 className="font-bold text-gray-900 mb-3">Game Positions (FEN)</h4>
+                                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto">
+                                    {selectedGame.pgn.map((fen, idx) => (
+                                      <div key={idx} className="mb-2 pb-2 border-b border-gray-100">
+                                        <div className="flex items-center mb-1">
+                                          <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                                            {idx + 1}
+                                          </span>
+                                          <span className="text-sm font-medium">
+                                            {idx === 0 ? 'Initial Position' : `After move ${idx}`}
+                                          </span>
+                                        </div>
+                                        <code className="block font-mono text-xs text-gray-600 whitespace-nowrap overflow-x-auto p-1">
+                                          {fen}
+                                        </code>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-between">
+                              <button
+                                onClick={openGameViewer}
+                                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
+                              >
+                                View Chessboard
+                              </button>
+                              <button
+                                onClick={closeModal}
+                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {showGameViewer && selectedGame && (
+                        <GameViewer
+                          gameData={selectedGame}
+                          onClose={closeGameViewer}
+                        />
+                      )}
                     </tr>
                   ))}
                 </tbody>
