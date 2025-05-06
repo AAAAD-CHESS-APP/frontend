@@ -24,6 +24,9 @@ import Userdashboard from "./Users/Userdashboard";
 import ResultPage from "./Components/ResultPage";
 import RecentGames from "./Users/RecentGames";
 import UserUpdatePassword from "./Users/UserUpdatePassword";
+import DailyPuzzle from "./Users/DailyPuzzle";
+import Opening from "./Users/Opening";
+import LeaderBoard from "./Users/LeaderBoard";
 
 function App() {
   const hoverIntensity = 0.5;
@@ -38,7 +41,6 @@ function App() {
           <Route path="/login" element={<Login />}></Route>
           <Route path="/verify" element={<Verify />}></Route>
           <Route path="/signup" element={<Signup />} />
-          {/* <Route path="/home" element={<Home />}></Route> */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/update-password/:id" element={<UpdatePassword />} />
           <Route path="/verify-email/:token" element={<VerifyConfirmation />} />
@@ -120,6 +122,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserUpdatePassword />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/daily-puzzle"
+            element={
+              <ProtectedRoute>
+                <DailyPuzzle />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/openings"
+            element={
+              <ProtectedRoute>
+                <Opening />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <LeaderBoard />
               </ProtectedRoute>
             }
           />

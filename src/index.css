@@ -1,3 +1,43 @@
+/* Global Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888c95;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888c95 #f1f1f1;
+}
+
+/* Ensure the body has the scrollbar style too */
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: #888c95 #f1f1f1;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

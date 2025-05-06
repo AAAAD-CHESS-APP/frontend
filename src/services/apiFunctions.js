@@ -1,4 +1,4 @@
-import { adminAPI, userAPI, gameAPI } from "./api";
+import { adminAPI, userAPI, gameAPI, puzzleAPI } from "./api";
 
 // ==================== AUTH FUNCTIONS ====================
 export const adminLogin = async (email, password) => {
@@ -392,3 +392,28 @@ function generateActivityFeed(games, bannedUsers) {
     .sort((a, b) => new Date(b.time) - new Date(a.time))
     .slice(0, 5);
 }
+
+// Add this at the end of your file
+export const fetchDailyPuzzle = async () => {
+  try {
+    const response = await puzzleAPI.getDailyPuzzle();
+    
+    if (!response || response.status === "error") {
+      return {
+        success: false,
+        message: response?.message || "Failed to fetch daily puzzle",
+      };
+    }
+    
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error fetching daily puzzle:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to fetch daily puzzle",
+    };
+  }
+};

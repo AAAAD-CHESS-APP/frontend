@@ -6,6 +6,7 @@ import { MdGames, MdLeaderboard, MdOutlineEmojiEvents } from "react-icons/md";
 import UserContext from "../Context/UserContext";
 import toast from "react-hot-toast";
 import { authAPI, userAPI } from "../services/api";
+import DashboardNavbar from "./DashboardNabvar"; // Import the navbar
 
 export default function Userdashboard() {
   const navigate = useNavigate();
@@ -115,12 +116,6 @@ export default function Userdashboard() {
     fetchUserData();
   }, [navigate, setUser]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser("");
-    toast.success("Logged out successfully");
-    navigate("/");
-  };
 
   const handleUpdateUsername = async (e) => {
     e.preventDefault();
@@ -160,22 +155,23 @@ export default function Userdashboard() {
   };
 
   const getPieChartData = () => {
-    const hasGames = userData.wins > 0 || userData.loses > 0 || userData.draws > 0;
+    const hasGames =
+      userData.wins > 0 || userData.loses > 0 || userData.draws > 0;
     if (!hasGames) return [];
     const data = [];
-    
+
     if (userData.wins > 0) {
       data.push({ name: "Wins", value: userData.wins, color: "#10B981" });
     }
-    
+
     if (userData.loses > 0) {
       data.push({ name: "Losses", value: userData.loses, color: "#EF4444" });
     }
-    
+
     if (userData.draws > 0) {
       data.push({ name: "Draws", value: userData.draws, color: "#6B7280" });
     }
-    
+
     return data;
   };
 
@@ -206,30 +202,7 @@ export default function Userdashboard() {
 
   return (
     <div className="bg-white flex h-screen overflow-hidden">
-      <div className="w-full text-black py-4 px-20 fixed top-0 left-0 z-10 flex justify-between items-center">
-        <button
-          onClick={() => navigate("/")}
-          className="bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 flex items-center gap-2"
-        >
-          <MdGames size={18} />
-          Home
-        </button>
-        <div className="flex items-center gap-4">
-          <div className="bg-black text-white py-2 px-4 rounded-md flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center text-black font-bold text-xs">
-              {userData.username.charAt(0).toUpperCase()}
-            </div>
-            <span>{userData.username}</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1 text-sm hover:text-gray-300"
-          >
-            <FiLogOut size={16} />{" "}
-            <span className="hidden sm:inline">Logout</span>
-          </button>
-        </div>
-      </div>
+      <DashboardNavbar/>
       <div className="flex-1 overflow-auto bg-gray-50 pt-16">
         <div className="mx-auto w-11/12 max-w-7xl py-6 space-y-8">
           <div className="flex justify-between items-center">
@@ -334,7 +307,9 @@ export default function Userdashboard() {
                           paddingAngle={5}
                           dataKey="value"
                           labelLine={false}
-                          label={({ name, value }) => `${name}: ${Math.round(value)}`} // Round to fix decimals
+                          label={({ name, value }) =>
+                            `${name}: ${Math.round(value)}`
+                          } // Round to fix decimals
                         >
                           {pieData.map((entry, index) => (
                             <Cell
@@ -458,7 +433,11 @@ export default function Userdashboard() {
                   </button>
 
                   <button
-                    onClick={() => navigate("/dashboard-pannel/update-password/" + userData.id)}
+                    onClick={() =>
+                      navigate(
+                        "/dashboard-pannel/update-password/" + userData.id
+                      )
+                    }
                     className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-all"
                   >
                     <div className="flex items-center">
@@ -494,10 +473,13 @@ export default function Userdashboard() {
                 <p className="text-xs text-gray-500">
                   Need help? Contact{" "}
                   <a
-                    href="mailto:aichess.dev@gmail.com"
-                    className="text-black underline"
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=aichess.dev@gmail.com&su=Support%20Request&body=Hi%20Support%2C%0A%0AI%20am%20facing%20an%20issue%20with%20..."
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    aichess.dev@gmail.com
+                    <button className="underline text-black">
+                      aichess.dev@gmail.com
+                    </button>
                   </a>
                 </p>
               </div>
