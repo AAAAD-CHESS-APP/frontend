@@ -212,25 +212,26 @@ export default function DailyPuzzle() {
       return false;
     }
   };
-
   const onDrop = (sourceSquare, targetSquare) => {
     if (puzzleSolved || showSolution) return false;
+
     const pieceType = game.get(sourceSquare)?.type;
     const isLastRank =
       targetSquare.charAt(1) === "8" || targetSquare.charAt(1) === "1";
+
     const move = {
       from: sourceSquare,
       to: targetSquare,
+      promotion: pieceType === "p" && isLastRank ? "q" : undefined,
     };
 
-    // Only add promotion for pawns moving to the last rank
-    if (pieceType === "p" && isLastRank) {
-      move.promotion = "q";
-    }
+    // Try to make the user's move
+    const newGame = new Chess(game.fen());
+    const moveResult = newGame.move(move);
 
-    const moveResult = makeMove(move);
     if (!moveResult) return false;
 
+    // User move was legal, now check if it matches the expected puzzle move
     if (
       puzzleData?.puzzle?.solution &&
       puzzleData.puzzle.solution.length > moveIndex
@@ -242,114 +243,114 @@ export default function DailyPuzzle() {
       const moveMatches = userMove === expectedMove.substring(0, 4);
 
       if (moveMatches) {
+        // User made the correct move, update state
+        setGame(newGame);
         setMoveIndex(moveIndex + 1);
 
         if (moveIndex + 1 >= puzzleData.puzzle.solution.length) {
+          // This was the last move, puzzle is solved
           setPuzzleSolved(true);
-
           const puzzleState = {
             puzzleId: puzzleData.puzzle.id,
             solved: true,
             date: new Date().toISOString().split("T")[0],
           };
           localStorage.setItem("dailyPuzzleState", JSON.stringify(puzzleState));
-
           toast.success("Puzzle solved! Well done!");
         } else {
           // Try to make the computer's move after a slight delay
           setTimeout(() => {
             try {
+              // Get the computer's move from the solution
               const computerMove = puzzleData.puzzle.solution[moveIndex + 1];
               const from = computerMove.substring(0, 2);
               const to = computerMove.substring(2, 4);
-              
-              // Get the piece at the from position
-              const piece = game.get(from);
-              
-              // Check if there's actually a piece at the 'from' position
-              if (!piece) {
-                console.error(`No piece found at position ${from}. Skipping computer move.`);
-                setMoveIndex(moveIndex + 2); // Skip to the next player move
-                return;
-              }
-              
-              // Check if the move is valid
-              const validMoves = game.moves({ 
-                square: from, 
-                verbose: true 
-              });
-              
-              const isValidMove = validMoves.some(move => move.to === to);
-              
-              console.log("Computer move:", from, "to", to, "Piece:", piece, "Valid moves:", 
-                validMoves.map(m => `${m.from}-${m.to}`));
-              
-              if (!isValidMove) {
-                console.error(`Invalid computer move from ${from} to ${to}. Checking for alternative moves.`);
-                
-                // If the specific move is invalid, try to find any legal move for the piece
-                if (validMoves.length > 0) {
-                  const alternativeMove = validMoves[0];
-                  console.log(`Attempting alternative move: ${alternativeMove.from} to ${alternativeMove.to}`);
-                  
-                  // Make the alternative move
-                  makeMove({
-                    from: alternativeMove.from,
-                    to: alternativeMove.to,
-                    promotion: alternativeMove.promotion
-                  });
-                } else {
-                  // If no legal moves for this piece, just skip this turn
-                  console.log("No legal moves available for this piece. Skipping.");
+
+              // Create a new game instance from current position
+              const computerGame = new Chess(newGame.fen());
+
+              // Check if the computer move is valid
+              const validMoves = computerGame.moves({ verbose: true });
+              const isValidComputerMove = validMoves.some(
+                (m) => m.from === from && m.to === to
+              );
+
+              if (!isValidComputerMove) {
+                console.warn(
+                  `Computer move ${from}-${to} is not valid in current position`
+                );
+                console.log("Current FEN:", computerGame.fen());
+                console.log(
+                  "Valid moves:",
+                  validMoves.map((m) => `${m.from}-${m.to}`)
+                );
+
+                // Try to find an alternative move that works
+                let alternativeMoveFound = false;
+
+                // Look for any piece that can move to the target square
+                for (const m of validMoves) {
+                  if (m.to === to) {
+                    computerGame.move(m);
+                    alternativeMoveFound = true;
+                    console.log(`Used alternative move: ${m.from}-${m.to}`);
+                    break;
+                  }
                 }
-                
-                // Move to next move in solution sequence regardless
-                setMoveIndex(moveIndex + 2);
-                return;
-              }
-              
-              // Create move object without promotion by default
-              const moveObj = {
-                from: from,
-                to: to
-              };
-              
-              // Only add promotion for pawns moving to the last rank
-              if (piece.type === "p" && (to.charAt(1) === "8" || to.charAt(1) === "1")) {
-                moveObj.promotion = "q";
-              }
-              
-              // Make the computer move
-              const computerMoveResult = makeMove(moveObj);
-              
-              if (computerMoveResult) {
-                // Successfully made the computer move
-                setMoveIndex(moveIndex + 2);
+
+                if (!alternativeMoveFound) {
+                  // Just make any legal move if specific move can't be found
+                  if (validMoves.length > 0) {
+                    computerGame.move(validMoves[0]);
+                    console.log(
+                      `Used fallback move: ${validMoves[0].from}-${validMoves[0].to}`
+                    );
+                  } else {
+                    console.error("No legal moves available");
+                  }
+                }
               } else {
-                console.error("Failed to make computer move. Skipping to next move.");
-                setMoveIndex(moveIndex + 2);
+                // The computer move is valid, make it
+                const moveObj = {
+                  from,
+                  to,
+                  promotion:
+                    computerGame.get(from)?.type === "p" &&
+                    (to.charAt(1) === "8" || to.charAt(1) === "1")
+                      ? "q"
+                      : undefined,
+                };
+
+                computerGame.move(moveObj);
               }
+
+              // Update the game state with the computer's move
+              setGame(computerGame);
+              setMoveIndex(moveIndex + 2);
             } catch (error) {
               console.error("Error making computer move:", error);
+              // Skip to next user move
               setMoveIndex(moveIndex + 2);
             }
           }, 500);
         }
-        
+
         return true;
       } else {
-        // Inform user of incorrect move but don't roll back
+        // Incorrect move
         toast.error("Incorrect move. Try again.");
-        
+
         // Reset to the position before the move
         setTimeout(() => {
           resetPuzzle(true);
         }, 500);
-        
+
         return true;
       }
     }
-    
+
+    // If we get here, just accept the move
+    setGame(newGame);
     return true;
   };
 
@@ -402,48 +403,63 @@ export default function DailyPuzzle() {
         toast.success("Solution completed!");
         return;
       }
-      
+
       const move = solutionMoves[index];
       const from = move.substring(0, 2);
       const to = move.substring(2, 4);
-      
+
       setTimeout(() => {
         try {
           // Get the piece at the from position
           const piece = currentGame.get(from);
-          
+
           // Check if the move is valid before attempting it
-          const isValidMove = currentGame.moves({ 
-            square: from, 
-            verbose: true 
-          }).some(move => move.to === to);
-          
+          const isValidMove = currentGame
+            .moves({
+              square: from,
+              verbose: true,
+            })
+            .some((move) => move.to === to);
+
           if (!isValidMove) {
-            console.error(`Invalid solution move from ${from} to ${to}. Skipping.`);
+            console.error(
+              `Invalid solution move from ${from} to ${to}. Skipping.`
+            );
             // Continue to next move
             playSolution(index + 1);
             return;
           }
-          
+
           // Create move object without promotion by default
           const moveObj = {
             from: from,
-            to: to
+            to: to,
           };
-          
+
           // Only add promotion for pawns moving to the last rank
-          if (piece && piece.type === 'p' && (to.charAt(1) === '8' || to.charAt(1) === '1')) {
-            moveObj.promotion = 'q';
+          if (
+            piece &&
+            piece.type === "p" &&
+            (to.charAt(1) === "8" || to.charAt(1) === "1")
+          ) {
+            moveObj.promotion = "q";
           }
-          
+
           // Execute the move
           currentGame.move(moveObj);
           setGame(new Chess(currentGame.fen()));
-          
+
           // Continue to next move
           playSolution(index + 1);
         } catch (e) {
-          console.error("Invalid solution move:", e, "at index", index, "move:", move);
+          console.error(
+            "Invalid solution move:",
+            e,
+            "at index",
+            index,
+            "move:",
+            move
+          );
           // Try to continue with the next move
           playSolution(index + 1);
         }
@@ -655,7 +671,6 @@ export default function DailyPuzzle() {
                       </p>
                     </div>
                   )}
-
                 </div>
               </div>
 
