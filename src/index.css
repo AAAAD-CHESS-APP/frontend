@@ -1,41 +1,46 @@
-/* Global Custom Scrollbar */
+/* Glassy Modern Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: rgba(240, 240, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(80, 80, 120, 0.07) inset;
+  backdrop-filter: blur(2px);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888c95;
-  border-radius: 4px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+  background: linear-gradient(120deg, rgba(80,80,120,0.18) 0%, rgba(120,120,180,0.32) 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(80, 80, 120, 0.10);
+  border: 2px solid rgba(255,255,255,0.5);
+  min-height: 40px;
+  transition: background 0.3s, box-shadow 0.3s;
+  backdrop-filter: blur(1.5px);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+  background: linear-gradient(120deg, rgba(60,60,100,0.35) 0%, rgba(80,80,120,0.45) 100%);
+  box-shadow: 0 4px 16px rgba(80, 80, 120, 0.18);
 }
 
 ::-webkit-scrollbar-corner {
-  background: #f1f1f1;
+  background: transparent;
 }
 
-/* For Firefox */
+/* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #888c95 #f1f1f1;
+  scrollbar-color: #a3a3c2 #f0f0ff;
 }
 
 /* Ensure the body has the scrollbar style too */
 html, body {
   scrollbar-width: thin;
-  scrollbar-color: #888c95 #f1f1f1;
+  scrollbar-color: #b6bbc7 #f7fafc;
 }
 
 @tailwind base;
